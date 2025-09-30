@@ -1,0 +1,19 @@
+{
+    "name": "BBBirder.Utils.Editor",
+    "rootNamespace": "BBBirder.Utils.Editor",
+    "references": [
+        "BBBirder.Utils",
+        "com.bbbirder.directattribute"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

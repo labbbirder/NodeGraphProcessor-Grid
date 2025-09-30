@@ -1,0 +1,28 @@
+#graphRootView
+{
+    background-color: #101010;
+}
+
+/* ToolbarOverlayContainer #unity-overlay
+{
+    flex-shrink:1;
+    flex-grow:1;
+}
+
+*/
+
+ToolbarOverlayContainer .unity-overlay
+{
+    flex-shrink:1;
+}
+
+.overlay-header
+{
+    flex-shrink:0;
+}
+
+#overlay-scene-containers > OverlayContainer > .unity-overlay
+{
+    flex-shrink:1;
+    /* flex-grow:1; */
+} 

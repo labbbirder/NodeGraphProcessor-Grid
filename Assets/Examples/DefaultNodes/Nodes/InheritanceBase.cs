@@ -1,24 +1,24 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using GraphProcessor;
 using System.Linq;
+using GraphProcessor;
+using UnityEngine;
 
 [System.Serializable, NodeMenuItem("Custom/InheritanceBase")]
-public class InheritanceBase : BaseNode
+public partial class InheritanceBase : BaseNode
 {
-	[Input(name = "In Base")]
-    public float                input;
+	[Input(name: "In Base")]
+	public float input;
 
-	[Output(name = "Out Base")]
-	public float				output;
+	[Output(name: "Out Base")]
+	public float output;
 
-	public float				fieldBase;
+	public float fieldBase;
 
-	public override string		name => "InheritanceBase";
+	public override string name => "InheritanceBase";
 
-	protected override void Process()
+	protected virtual void Process()
 	{
-	    output = input * 42;
+		output = input * 42;
 	}
 }

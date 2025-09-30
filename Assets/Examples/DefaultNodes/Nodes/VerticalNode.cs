@@ -1,23 +1,18 @@
-using UnityEngine;
 using GraphProcessor;
+using UnityEngine;
 
 [System.Serializable, NodeMenuItem("Custom/Vertical")]
-public class VerticalNode : BaseNode
+public partial class VerticalNode : BaseNode
 {
 	[Input, Vertical]
-    public float                input;
+	public float input;
 
 	[Output, Vertical]
-	public float				output;
+	public float output;
 	[Output, Vertical]
-	public float				output2;
+	public float output2;
 	[Output, Vertical]
-	public float				output3;
+	public float output3;
 
-	public override string		name => "Vertical";
-
-	protected override void Process()
-	{
-	    output = input * 42;
-	}
+	public override string name => "Vertical";
 }

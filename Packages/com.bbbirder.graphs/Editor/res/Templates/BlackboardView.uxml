@@ -1,0 +1,9 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:VisualElement name="content" picking-mode="Ignore" style="flex-grow: 1;">
+        <ui:VisualElement style="flex-direction: row; flex-shrink: 0;">
+            <ui:TextField picking-mode="Ignore" name="txtName" style="flex-grow: 1;" />
+            <ui:Button text="New" parse-escape-sequences="true" display-tooltip-when-elided="true" name="btnNew" />
+        </ui:VisualElement>
+        <ui:ScrollView name="content" style="flex-grow: 1;" />
+    </ui:VisualElement>
+</ui:UXML>

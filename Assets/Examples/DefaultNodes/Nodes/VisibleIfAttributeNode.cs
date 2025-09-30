@@ -1,11 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using GraphProcessor;
 using System.Linq;
+using GraphProcessor;
+using UnityEngine;
 
 [System.Serializable, NodeMenuItem("Custom/VisibleIfAttributeNode")]
-public class VisibleIfAttributeNode : BaseNode
+public partial class VisibleIfAttributeNode : BaseNode
 {
 	public enum Test1
 	{
@@ -34,16 +34,11 @@ public class VisibleIfAttributeNode : BaseNode
 	[VisibleIf(nameof(t1), Test1.C)]
 	public Test2 t2;
 
-	[Input(name = "In")]
-    public float                input;
+	[Input(name: "In")]
+	public float input;
 
-	[Output(name = "Out")]
-	public float				output;
+	[Output(name: "Out")]
+	public float output;
 
-	public override string		name => "VisibleIfAttributeNode";
-
-	protected override void Process()
-	{
-	    output = input * 42;
-	}
+	public override string name => "VisibleIfAttributeNode";
 }

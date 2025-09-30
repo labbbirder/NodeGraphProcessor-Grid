@@ -1,31 +1,71 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
+using System.Reflection;
 using GraphProcessor;
+using UnityEditor;
+using UnityEngine;
 
-public class RuntimeGraph : MonoBehaviour
+#warning TODO: custom editor
+public class RuntimeGraph<T> : MonoBehaviour, IGraphOwner<T> where T : BaseGraph
 {
-	public BaseGraph	graph;
-	public ProcessGraphProcessor	processor;
+	public bool useTemplate;
+	public GraphTemplate<T> template;
+	public T graph;
+	// [NonSerialized] public BaseGraphProcessor processor;
 
-	public GameObject	assignedGameObject;
+	public GameObject assignedGameObject;
+
+	public T Graph => graph;
+
+	[NonSerialized] bool isInited;
+	private void EnsureInited()
+	{
+		if (isInited) return;
+		isInited = true;
+
+		if (useTemplate)
+		{
+			graph = template != null
+				? JsonUtility.FromJson<T>(JsonUtility.ToJson(template.Graph))
+				: null;
+		}
+	}
 
 	private void Start()
 	{
-		if (graph != null)
-			processor = new ProcessGraphProcessor(graph);
-	}
-
-	int i = 0;
-
-    void Update()
-    {
+		EnsureInited();
 		if (graph != null)
 		{
-			graph.SetParameterValue("Input", (float)i++);
-			graph.SetParameterValue("GameObject", assignedGameObject);
-			processor.Run();
-			Debug.Log("Output: " + graph.GetParameterValue("Output"));
+			// var g = ScriptableObject.Instantiate(graph);
+			// processor = g.CreateProcessor();
 		}
-    }
+	}
+
+	// int i = 0;
+
+	async void Update()
+	{
+		if (graph != null)
+		{
+			// graph.SetParameterValue("Input", (float)i++);
+			// graph.SetParameterValue("GameObject", assignedGameObject);
+			// processor.Run();
+			// Debug.Log("Output: " + graph.GetParameterValue("Output"));
+		}
+
+	}
+
+	public void CreateSerialized(out SerializedObject serializedObject, out SerializedProperty graphProperty)
+	{
+		if (useTemplate && !Application.isPlaying)
+		{
+			template.CreateSerialized(out serializedObject, out graphProperty);
+		}
+		else
+		{
+			serializedObject = new(this);
+			graphProperty = serializedObject.FindProperty(nameof(graph));
+		}
+	}
 }

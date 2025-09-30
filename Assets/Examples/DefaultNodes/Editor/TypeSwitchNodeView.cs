@@ -1,11 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEditor;
-using UnityEditor.UIElements;
-using UnityEditor.Experimental.GraphView;
-using UnityEngine.UIElements;
 using GraphProcessor;
+using UnityEditor;
+using UnityEditor.Experimental.GraphView;
+using UnityEditor.UIElements;
+using UnityEngine;
+using UnityEngine.UIElements;
 
 [NodeCustomEditor(typeof(TypeSwitchNode))]
 public class TypeSwitchNodeView : BaseNodeView
@@ -14,10 +14,11 @@ public class TypeSwitchNodeView : BaseNodeView
 	{
 		var node = nodeTarget as TypeSwitchNode;
 
-		var t = new Toggle("Swith type"){ value = node.toggleType };
-		t.RegisterValueChangedCallback(e => {
+		var t = new Toggle("Swith type") { value = node.toggleType };
+		t.RegisterValueChangedCallback(e =>
+		{
 			node.toggleType = e.newValue;
-			ForceUpdatePorts();
+			// ForceUpdatePorts();
 		});
 
 		controlsContainer.Add(t);

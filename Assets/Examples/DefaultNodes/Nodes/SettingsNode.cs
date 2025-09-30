@@ -1,8 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using GraphProcessor;
 using System.Linq;
+using GraphProcessor;
+using UnityEngine;
 
 public enum Setting
 {
@@ -12,16 +12,15 @@ public enum Setting
 }
 
 [System.Serializable, NodeMenuItem("Custom/SettingsNode")]
-public class SettingsNode : BaseNode
+public partial class SettingsNode : BaseNode
 {
-	public Setting				setting;
-	public override string		name => "SettingsNode";
+	public Setting setting;
+	public override string name => "SettingsNode";
 
 	[Input]
-	public float			input;
-	
-	[Output]
-	public float			output;
+	public float input;
 
-	protected override void Process() {}
+	[Output]
+	public float output;
+
 }

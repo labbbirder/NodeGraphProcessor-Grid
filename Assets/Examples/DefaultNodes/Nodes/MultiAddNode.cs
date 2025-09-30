@@ -1,40 +1,68 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using GraphProcessor;
 using System.Linq;
+using BBBirder.Graphs;
+using GraphProcessor;
+using UnityEngine;
+
+[System.Serializable, NodeMenuItem("Custom/Add2")]
+public partial class Add2 : BaseNode
+{
+    [Input] public float a;
+    [Input] public float b;
+
+    [Output] public float sum;
+
+    public override void Enter()
+    {
+        sum = a + b;
+    }
+}
+
+[System.Serializable, NodeMenuItem("Custom/Fin")]
+public partial class Fin : LinearExecutionNode
+{
+    [Input] public float a;
+
+}
 
 [System.Serializable, NodeMenuItem("Custom/MultiAdd")]
-public class MultiAddNode : BaseNode
+public partial class MultiAddNode : BaseNode
 {
-	[Input]
-	public IEnumerable< float >	inputs = null;
+    [Input]
+    public IEnumerable<float> inputs = null;
 
-	[Output]
-	public float				output;
+    [Output, ShowAsDrawer]
+    public float output;
 
-	public override string		name => "Add";
+    public override string name => "Add";
 
-	protected override void Process()
-	{
-		output = 0;
+    // protected override void Process()
+    // {
+    //     output = 0;
 
-		if (inputs == null)
-			return ;
+    //     if (inputs == null)
+    //         return;
 
-		foreach (float input in inputs)
-			output += input;
-	}
+    //     foreach (float input in inputs)
+    //         output += input;
+    // }
 
-	[CustomPortBehavior(nameof(inputs))]
-	IEnumerable< PortData > GetPortsForInputs(List< SerializableEdge > edges)
-	{
-		yield return new PortData{ displayName = "In ", displayType = typeof(float), acceptMultipleEdges = true};
-	}
+    // [CustomPortBehavior(nameof(inputs))]
+    // IEnumerable<PortData> GetPortsForInputs(List<SerializableEdge> edges)
+    // {
+    //     yield return new PortData { displayName = "In ", displayType = typeof(float), acceptMultipleEdges = true };
+    // }
 
-	[CustomPortInput(nameof(inputs), typeof(float), allowCast = true)]
-	public void GetInputs(List< SerializableEdge > edges)
-	{
-		inputs = edges.Select(e => (float)e.passThroughBuffer);
-	}
+    // [CustomPortInput(nameof(inputs), typeof(float), allowCast = true)]
+    // public void GetInputs(List<SerializableEdge> edges)
+    // {
+    //     inputs = edges.Select(e => RuntimeConverter.Convert<float>(e.passThroughBuffer));
+    // }
+
+    // mark to inputs attribute
+    public void SetInputValue(float value, int index)
+    {
+
+    }
 }

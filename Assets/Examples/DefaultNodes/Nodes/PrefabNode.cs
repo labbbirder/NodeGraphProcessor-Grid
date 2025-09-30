@@ -1,14 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using GraphProcessor;
 using System.Linq;
+using GraphProcessor;
+using UnityEngine;
 
 [System.Serializable, NodeMenuItem("Custom/Prefab")]
-public class PrefabNode : BaseNode
+public partial class PrefabNode : BaseNode
 {
-	[Output(name = "Out"), SerializeField]
-	public GameObject			output;
+	[Output(name: "Out"), SerializeField]
+	public GameObject output;
 
-	public override string		name => "Prefab";
+	public override string name => "Prefab";
 }

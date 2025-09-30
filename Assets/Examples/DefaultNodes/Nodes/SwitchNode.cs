@@ -1,22 +1,46 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using GraphProcessor;
 using System.Linq;
+using BBBirder;
+using GraphProcessor;
+using UnityEngine;
 
 [System.Serializable, NodeMenuItem("Conditional/Switch")]
-public class SwitchNode : BaseNode
+public partial class SwitchNode : BaseNode
 {
-	[Input(name = "In")]
-    public float                input;
+	[Input]
+	public ExecutionLink executed;
 
-	[Output(name = "Out")]
-	public float				output;
+	[Input(name: "In")]
+	public float input;
 
-	public override string		name => "Switch";
+	// [Polymorphic]
+	[TypeHandleFilter(typeof(Enum))]
+	public TypeHandle enumType;
 
-	protected override void Process()
+	[Output(name: "Out", hide: true)]
+	public ExecutionLink output;
+
+	public override string name => "Switch";
+
+	protected override void LoadPorts()
 	{
-	    output = input * 42;
+		base.LoadPorts();
+		Debug.Log("load ports " + enumType.Type);
+
+		if (enumType.Type != null)
+		{
+			foreach (var e in Enum.GetNames(enumType.Type))
+			{
+				AddPort(false, $"output", new PortData()
+				{
+					identifier = e.ToString(),
+					displayName = e.ToString(),
+					displayType = typeof(ExecutionLink),
+				});
+			}
+		}
 	}
+
 }

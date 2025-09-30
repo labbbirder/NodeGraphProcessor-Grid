@@ -23,12 +23,12 @@ using System.Linq;
 [System.Serializable, NodeMenuItem("Operations/Sub")] // Add the node in the node creation context menu
 public class SubNode : BaseNode
 {
-    [Input(name = "A")]
+    [Input(name : "A")]
     public float                inputA;
-    [Input(name = "B")]
+    [Input(name : "B")]
     public float                inputB;
 
-    [Output(name = "Out")]
+    [Output(name : "Out")]
     public float				output;
 
     public override string		name => "Sub";

@@ -1,0 +1,336 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8b55bab36948c04b9a6bfab86a85347, type: 3}
+  m_Name: New Execution Graph Template
+  m_EditorClassIdentifier: 
+  graph:
+    nodes:
+    - rid: 5309892601385844787
+    - rid: 5309892602378846250
+    - rid: 5309892602378846251
+    - rid: 5309892602378846252
+    - rid: 5309892629070610537
+    - rid: 5309892646279315707
+    - rid: 5309892646279315731
+    - rid: 5309892646279315732
+    - rid: 5309892646279315733
+    - rid: 5309892646279315734
+    - rid: 5309892646279315735
+    - rid: 5309892650442686840
+    - rid: 5309892650442686841
+    - rid: 5309892650442687027
+    edges:
+    - GUID: 7305641e-094b-427a-a34f-526d587bfd76
+      inputNodeGUID: 49931771-a99c-4ea6-b61f-2e5ecaaf6089
+      outputNodeGUID: 6e9007f6-faee-46c4-a8fb-d24355f8d6eb
+      inputFieldName: executed
+      outputFieldName: executes
+      inputPortIdentifier: 
+      outputPortIdentifier: 
+    - GUID: 7f0d189d-3815-4467-8ad6-0b66723f1515
+      inputNodeGUID: 4f7bfe82-245d-4ea1-9052-925af37e5b74
+      outputNodeGUID: 49931771-a99c-4ea6-b61f-2e5ecaaf6089
+      inputFieldName: input
+      outputFieldName: index
+      inputPortIdentifier: 
+      outputPortIdentifier: 
+    - GUID: 03623dd4-d6fb-4ddb-a011-bb7975148ab5
+      inputNodeGUID: 07d6b3d3-bc8e-4ec1-b1f2-67374d09c04f
+      outputNodeGUID: 92daea53-e9e0-418f-a196-bcdf704767d1
+      inputFieldName: obj
+      outputFieldName: output
+      inputPortIdentifier: 
+      outputPortIdentifier: 
+    - GUID: 8057eee1-326f-48cd-88eb-61fe2a10fb55
+      inputNodeGUID: 07d6b3d3-bc8e-4ec1-b1f2-67374d09c04f
+      outputNodeGUID: 4f7bfe82-245d-4ea1-9052-925af37e5b74
+      inputFieldName: executed
+      outputFieldName: output
+      inputPortIdentifier: 
+      outputPortIdentifier: 3
+    - GUID: 2a4eb7fa-449f-4cbf-892a-d6ead540f977
+      inputNodeGUID: 868c768b-9fed-473e-8a90-bd8a0b276143
+      outputNodeGUID: 7509608a-134a-46c7-ae94-6428d8bd7298
+      inputFieldName: obj
+      outputFieldName: output
+      inputPortIdentifier: 
+      outputPortIdentifier: 
+    - GUID: 4e27f8a2-4002-48b4-aca7-244609312312
+      inputNodeGUID: 346e177e-2836-4d29-a985-cddde850d4a4
+      outputNodeGUID: 49931771-a99c-4ea6-b61f-2e5ecaaf6089
+      inputFieldName: obj
+      outputFieldName: index
+      inputPortIdentifier: 
+      outputPortIdentifier: 
+    - GUID: f7029eb0-a3e8-4a8e-8d9f-642588ce99b8
+      inputNodeGUID: 868c768b-9fed-473e-8a90-bd8a0b276143
+      outputNodeGUID: 4f7bfe82-245d-4ea1-9052-925af37e5b74
+      inputFieldName: executed
+      outputFieldName: output
+      inputPortIdentifier: 
+      outputPortIdentifier: 1
+    - GUID: 08cf3eda-eadc-4ceb-8435-aaed9d8d5280
+      inputNodeGUID: 4f7bfe82-245d-4ea1-9052-925af37e5b74
+      outputNodeGUID: 49931771-a99c-4ea6-b61f-2e5ecaaf6089
+      inputFieldName: executed
+      outputFieldName: loopBody
+      inputPortIdentifier: 
+      outputPortIdentifier: 
+    - GUID: 84757ab9-c420-4513-b7f9-6436b26293dc
+      inputNodeGUID: 346e177e-2836-4d29-a985-cddde850d4a4
+      outputNodeGUID: 4f7bfe82-245d-4ea1-9052-925af37e5b74
+      inputFieldName: executed
+      outputFieldName: output
+      inputPortIdentifier: 
+      outputPortIdentifier: default
+    - GUID: c605fa4b-a1b7-40c2-8469-92a0684837a5
+      inputNodeGUID: 24052505-bd0a-4636-bcfa-95b6822f433d
+      outputNodeGUID: 8a23cd43-9830-4198-bd1e-10ddf1e56e2b
+      inputFieldName: input
+      outputFieldName: output
+      inputPortIdentifier: 
+      outputPortIdentifier: 
+    groups: []
+    stackNodes: []
+    exposedParameters: []
+    stickyNotes: []
+    nodeInspectorReference: {fileID: 0}
+    position: {x: -35, y: 568, z: 0}
+    scale: {x: 0.65751624, y: 0.65751624, z: 1}
+    startNodes:
+    - rid: 5309892629070610537
+  references:
+    version: 2
+    RefIds:
+    - rid: 5309892601385844787
+      type: {class: ForLoopNode, ns: , asm: Assembly-CSharp}
+      data:
+        GUID: 49931771-a99c-4ea6-b61f-2e5ecaaf6089
+        nodeCustomName: ForLoop
+        position:
+          serializedVersion: 2
+          x: 478
+          y: -173
+          width: 180
+          height: 123
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        index: 11
+        start: 0
+        end: 10
+    - rid: 5309892602378846250
+      type: {class: IfNode, ns: , asm: Assembly-CSharp}
+      data:
+        GUID: 1ddc032d-302c-49cf-a49b-3c1e1096bf01
+        nodeCustomName: 
+        position:
+          serializedVersion: 2
+          x: 1221.7001
+          y: 178.5
+          width: 152
+          height: 113
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        condition: 1
+        compareOperator: 0
+    - rid: 5309892602378846251
+      type: {class: Comparison, ns: NodeGraphProcessor.Examples, asm: Assembly-CSharp}
+      data:
+        GUID: 67030749-bc32-45c2-b040-8c56e5409832
+        nodeCustomName: 
+        position:
+          serializedVersion: 2
+          x: 920.00006
+          y: 91.499954
+          width: 191
+          height: 175
+        expanded: 1
+        debug: 0
+        nodeLock: 0
+        inA: 5
+        inB: 10
+        compared: 1
+        compareFunction: 4
+    - rid: 5309892602378846252
+      type: {class: FloatNode, ns: , asm: Assembly-CSharp}
+      data:
+        GUID: e213d69d-4afe-463d-8001-e0a5ffbccc9e
+        nodeCustomName: 
+        position:
+          serializedVersion: 2
+          x: 698
+          y: 140.63515
+          width: 151
+          height: 94
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        value: 0
+    - rid: 5309892629070610537
+      type: {class: StartNode, ns: BBBirder.Graphs, asm: Assembly-CSharp}
+      data:
+        GUID: 6e9007f6-faee-46c4-a8fb-d24355f8d6eb
+        nodeCustomName: 
+        position:
+          serializedVersion: 2
+          x: 306.8
+          y: -152
+          width: 88
+          height: 75
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+    - rid: 5309892646279315707
+      type: {class: SwitchOnIntNode, ns: , asm: Assembly-CSharp}
+      data:
+        GUID: 4f7bfe82-245d-4ea1-9052-925af37e5b74
+        nodeCustomName: SwitchOnIntNode
+        position:
+          serializedVersion: 2
+          x: 761
+          y: -242.00003
+          width: 208
+          height: 351
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        input: 10
+        options: 03000000010000000600000038000000
+    - rid: 5309892646279315731
+      type: {class: ConsoleNode, ns: BBBirder.Graphs, asm: Assembly-CSharp}
+      data:
+        GUID: 868c768b-9fed-473e-8a90-bd8a0b276143
+        nodeCustomName: 
+        position:
+          serializedVersion: 2
+          x: 1155
+          y: -242.00002
+          width: 170
+          height: 127
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        logText: Log
+        logType: 3
+    - rid: 5309892646279315732
+      type: {class: StringNode, ns: , asm: Assembly-CSharp}
+      data:
+        GUID: 92daea53-e9e0-418f-a196-bcdf704767d1
+        nodeCustomName: 
+        position:
+          serializedVersion: 2
+          x: 781.05005
+          y: -605.00006
+          width: 214
+          height: 177
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        output: Three
+    - rid: 5309892646279315733
+      type: {class: ConsoleNode, ns: BBBirder.Graphs, asm: Assembly-CSharp}
+      data:
+        GUID: 07d6b3d3-bc8e-4ec1-b1f2-67374d09c04f
+        nodeCustomName: 
+        position:
+          serializedVersion: 2
+          x: 1172.25
+          y: -390.50003
+          width: 170
+          height: 127
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        logText: Log
+        logType: 3
+    - rid: 5309892646279315734
+      type: {class: StringNode, ns: , asm: Assembly-CSharp}
+      data:
+        GUID: 7509608a-134a-46c7-ae94-6428d8bd7298
+        nodeCustomName: 
+        position:
+          serializedVersion: 2
+          x: 761.0001
+          y: -428.00006
+          width: 214
+          height: 177
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        output: One
+    - rid: 5309892646279315735
+      type: {class: ConsoleNode, ns: BBBirder.Graphs, asm: Assembly-CSharp}
+      data:
+        GUID: 346e177e-2836-4d29-a985-cddde850d4a4
+        nodeCustomName: 
+        position:
+          serializedVersion: 2
+          x: 1136.9999
+          y: -26.000008
+          width: 170
+          height: 127
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        logText: Log
+        logType: 3
+    - rid: 5309892650442686840
+      type: {class: SwitchOnStringNode, ns: , asm: Assembly-CSharp}
+      data:
+        GUID: 24052505-bd0a-4636-bcfa-95b6822f433d
+        nodeCustomName: 
+        position:
+          serializedVersion: 2
+          x: 478.00003
+          y: -519.65216
+          width: 159
+          height: 147
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        input: 
+        options:
+        - aa
+        - dd
+        - we1
+    - rid: 5309892650442686841
+      type: {class: StringNode, ns: , asm: Assembly-CSharp}
+      data:
+        GUID: 8a23cd43-9830-4198-bd1e-10ddf1e56e2b
+        nodeCustomName: 
+        position:
+          serializedVersion: 2
+          x: 243.65216
+          y: -628
+          width: 118
+          height: 400
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        output: 
+    - rid: 5309892650442687027
+      type: {class: FloatNode, ns: , asm: Assembly-CSharp}
+      data:
+        GUID: 39ced5ea-8cae-41b7-b3e6-017e37128fc2
+        nodeCustomName: 
+        position:
+          serializedVersion: 2
+          x: 582.5
+          y: -315.21927
+          width: 151
+          height: 94
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        value: 0

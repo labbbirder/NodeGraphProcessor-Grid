@@ -1,0 +1,95 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 015b4501bd4c2084385e4ef9f0839289, type: 3}
+  m_Name: New Behavior Tree Template
+  m_EditorClassIdentifier: 
+  graph:
+    nodes:
+    - rid: 5309892629070610493
+    - rid: 5309892629070610674
+    - rid: 5309892629070610675
+    edges: []
+    groups: []
+    stackNodes: []
+    exposedParameters:
+    - rid: 5309892628602159172
+    stickyNotes: []
+    nodeInspectorReference: {fileID: 0}
+    position: {x: 280, y: -164, z: 0}
+    scale: {x: 1, y: 1, z: 1}
+    startNodes:
+    - rid: 5309892629070610674
+    - rid: 5309892629070610675
+  references:
+    version: 2
+    RefIds:
+    - rid: 5309892628602159172
+      type: {class: Texture2DParameter, ns: GraphProcessor, asm: BBBirder.Graphs}
+      data:
+        guid: 339eab1b-78a3-47e8-967e-b9c7cb924ce5
+        name: New Texture 2D
+        type: 
+        input: 1
+        settings:
+          rid: 5309892628602159173
+        val: {fileID: 0}
+    - rid: 5309892628602159173
+      type: {class: ExposedParameter/Settings, ns: GraphProcessor, asm: BBBirder.Graphs}
+      data:
+        isHidden: 0
+        expanded: 0
+        guid: 339eab1b-78a3-47e8-967e-b9c7cb924ce5
+    - rid: 5309892629070610493
+      type: {class: SwitchNode, ns: , asm: Assembly-CSharp}
+      data:
+        GUID: e7d2c8b6-1580-4570-977a-d42fac1f48ee
+        nodeCustomName: 
+        position:
+          serializedVersion: 2
+          x: 323
+          y: 67
+          width: 100
+          height: 100
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        input: 0
+        enumType:
+          AQN: 
+    - rid: 5309892629070610674
+      type: {class: BTStartNode, ns: BBBirder.Graphs, asm: Assembly-CSharp}
+      data:
+        GUID: 87f682bf-7703-45bb-ab3d-65a3e2fe4bd6
+        nodeCustomName: 
+        position:
+          serializedVersion: 2
+          x: -12
+          y: 436
+          width: 70
+          height: 48
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+    - rid: 5309892629070610675
+      type: {class: SelectorNode, ns: BBBirder.Graphs, asm: Assembly-CSharp}
+      data:
+        GUID: e30ba957-5c38-4c37-9cca-8507352b22c1
+        nodeCustomName: 
+        position:
+          serializedVersion: 2
+          x: -52.470173
+          y: 585.91705
+          width: 100
+          height: 100
+        expanded: 0
+        debug: 0
+        nodeLock: 0

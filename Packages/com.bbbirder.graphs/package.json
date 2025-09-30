@@ -1,0 +1,12 @@
+{
+    "name": "com.bbbirder.graphs",
+    "displayName": "Graphs",
+    "version": "0.0.1",
+    "hideInEditor": false,
+    "scripts": {},
+    "dependencies": {
+        "com.bbbirder.utils": "0.0.2",
+        "org.nuget.system.runtime.compilerservices.unsafe": "6.1.2"
+    },
+    "author": "bbbirder <502100554@qq.com>"
+}

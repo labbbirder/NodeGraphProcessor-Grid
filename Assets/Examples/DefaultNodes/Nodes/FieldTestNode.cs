@@ -1,8 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using GraphProcessor;
 using System.Linq;
+using GraphProcessor;
+using UnityEngine;
 
 [System.Serializable, NodeMenuItem("Custom/FieldTestNode")]
 public class FieldTestNode : BaseNode
@@ -22,7 +22,6 @@ public class FieldTestNode : BaseNode
 	public Gradient gradient;
 	public AnimationCurve curve;
 
-	public override string		name => "FieldTestNode";
+	public override string name => "FieldTestNode";
 
-	protected override void Process() { }
 }

@@ -1,14 +1,14 @@
-using UnityEngine.UIElements;
+using System;
+using GraphProcessor;
+using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
-using GraphProcessor;
-using System;
-using UnityEditor;
+using UnityEngine.UIElements;
 
 public class AllGraphView : BaseGraphView
 {
 	// Nothing special to add for now
-	public AllGraphView(EditorWindow window) : base(window) {}
+	public AllGraphView(EditorWindow window) : base(window) { }
 
 	public override void BuildContextualMenu(ContextualMenuPopulateEvent evt)
 	{

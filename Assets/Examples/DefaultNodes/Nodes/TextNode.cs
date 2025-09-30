@@ -1,14 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using GraphProcessor;
 using System.Linq;
+using GraphProcessor;
+using UnityEngine;
 
 [System.Serializable, NodeMenuItem("Primitives/Text")]
-public class TextNode : BaseNode
+public partial class TextNode : BaseNode
 {
-	[Output(name = "Label"), SerializeField]
-	public string				output;
+	[Output(name: "Label"), SerializeField]
+	public string output;
 
-	public override string		name => "Text";
+	public override string name => "Text";
 }

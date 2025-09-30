@@ -1,0 +1,83 @@
+using System;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+
+namespace BBBirder
+{
+    {{~ for cnt in 2..6 ~}}
+    static partial class PoolableTuple
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static PoolableTuple<T1{{for i in 2..cnt}}, T{{i}}{{end}}> Get<T1{{for i in 2..cnt}}, T{{i}}{{end}}>(T1 arg1{{for i in 2..cnt}} ,T{{i}} arg{{i}}{{end}})
+        {
+            return Storage<T1{{for i in 2..cnt}}, T{{i}}{{end}}>.Get(arg1{{for i in 2..cnt}} ,arg{{i}}{{end}});
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static PoolableTuple<T1{{for i in 2..cnt}}, T{{i}}{{end}}> ToPoolable<T1{{for i in 2..cnt}}, T{{i}}{{end}}>(in this ValueTuple<T1{{for i in 2..cnt}}, T{{i}}{{end}}> tuple)
+        {
+            return Get(tuple.Item1{{for i in 2..cnt}} ,tuple.Item{{i}}{{end}});
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ValueTuple<T1{{for i in 2..cnt}}, T{{i}}{{end}}> ToValueTuple<T1{{for i in 2..cnt}}, T{{i}}{{end}}>(this PoolableTuple<T1{{for i in 2..cnt}}, T{{i}}{{end}}> tuple)
+        {
+            return (tuple.arg1{{for i in 2..cnt}} ,tuple.arg{{i}}{{end}});
+        }
+
+        internal static class Storage<T1{{for i in 2..cnt}}, T{{i}}{{end}}>
+        {
+            static Stack<PoolableTuple<T1{{for i in 2..cnt}}, T{{i}}{{end}}>> stack = new();
+            public static PoolableTuple<T1{{for i in 2..cnt}}, T{{i}}{{end}}> Get(T1 arg1{{for i in 2..cnt}}, T{{i}} arg{{i}}{{end}})
+            {
+                if (stack.TryPop(out var result))
+                {
+                    {{~for i in 1..cnt~}}
+                    result.arg{{i}} = arg{{i}};
+                    {{~end~}}
+                    return result;
+                }
+                else
+                {
+                    return new(arg1{{for i in 2..cnt}}, arg{{i}}{{end}});
+                }
+            }
+
+            public static void Release(PoolableTuple<T1{{for i in 2..cnt}}, T{{i}}{{end}}> tuple)
+            {
+                {{~for i in 1..cnt~}}
+                tuple.arg{{i}} = default;
+                {{~end~}}
+                stack.Push(tuple);
+            }
+        }
+    }
+
+    public class PoolableTuple<T1{{for i in 2..cnt}}, T{{i}}{{end}}> : IDisposable
+    {
+        {{~for i in 1..cnt~}}
+        public T{{i}} arg{{i}};
+        {{~end~}}
+
+        public PoolableTuple(T1 arg1{{for i in 2..cnt}}, T{{i}} arg{{i}}{{end}})
+        {
+            {{~for i in 1..cnt~}}
+            this.arg{{i}} = arg{{i}};
+            {{~end~}}
+        }
+
+        public void Deconstruct(out T1 arg1{{for i in 2..cnt}}, out T{{i}} arg{{i}}{{end}})
+        {
+            {{~for i in 1..cnt~}}
+            arg{{i}} = this.arg{{i}};
+            {{~end~}}
+        }
+
+        public void Dispose()
+        {
+            PoolableTuple.Storage<T1{{for i in 2..cnt}}, T{{i}}{{end}}>.Release(this);
+        }
+    }
+
+    {{~ end ~}}
+}

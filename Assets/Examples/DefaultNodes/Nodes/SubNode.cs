@@ -1,24 +1,19 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using GraphProcessor;
 using System.Linq;
+using GraphProcessor;
+using UnityEngine;
 
-[System.Serializable, NodeMenuItem("Operations/Sub")]
-public class SubNode : BaseNode
+[System.Serializable, NodeMenuItem("Operations/Subtract")]
+public partial class SubtractNode : BaseNode
 {
-	[Input(name = "A")]
-    public float                inputA;
-	[Input(name = "B")]
-    public float                inputB;
+	[Input(name: "A")]
+	public float inputA;
+	[Input(name: "B")]
+	public float inputB;
 
-	[Output(name = "Out")]
-	public float				output;
+	[Output(name: "Out")]
+	public float output;
 
-	public override string		name => "Sub";
-
-	protected override void Process()
-	{
-	    output = inputA - inputB;
-	}
+	public override string name => "Sub";
 }

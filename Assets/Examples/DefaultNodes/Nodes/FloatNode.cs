@@ -1,18 +1,16 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using GraphProcessor;
+using UnityEngine;
 
 [System.Serializable, NodeMenuItem("Primitives/Float")]
-public class FloatNode : BaseNode
+public partial class FloatNode : BaseNode
 {
-    [Output("Out")]
-	public float		output;
-	
-    [Input("In")]
-	public float		input;
+    [Output("Out"), ShowAsDrawer]
+    public float value;
 
-	public override string name => "Float";
+    public override string name => "Float";
 
-	protected override void Process() => output = input;
+    protected override bool IsDataFlowDeterministic => true;
 }

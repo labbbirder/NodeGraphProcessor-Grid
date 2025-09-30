@@ -1,0 +1,9 @@
+{
+  "name": "com.bbbirder.utils",
+  "displayName": "Utils",
+  "version": "0.0.2",
+  "hideInEditor": false,
+  "dependencies": {},
+  "scripts": {},
+  "author": "bbbirder <502100554@qq.com>"
+}

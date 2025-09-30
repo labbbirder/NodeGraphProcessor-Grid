@@ -1,11 +1,11 @@
-using UnityEngine.UIElements;
+using System;
+using GraphProcessor;
+using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
-using GraphProcessor;
-using System;
-using UnityEditor;
+using UnityEngine.UIElements;
 
 public class ExposedPropertiesGraphView : BaseGraphView
 {
-	public ExposedPropertiesGraphView(EditorWindow window) : base(window) {}
+	public ExposedPropertiesGraphView(EditorWindow window) : base(window) { }
 }
