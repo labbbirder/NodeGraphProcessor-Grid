@@ -185,7 +185,7 @@ namespace GraphProcessor
 			try
 			{
 				SetGraph.SetValue(node, graph);
-				node.ReloadPorts();
+				node.LoadPorts();
 				// node.UpdateAllPorts();
 			}
 			catch (Exception) { }

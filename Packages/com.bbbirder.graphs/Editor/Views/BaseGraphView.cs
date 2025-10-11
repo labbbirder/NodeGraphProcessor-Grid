@@ -76,8 +76,6 @@ namespace GraphProcessor
 		/// <returns></returns>
 		public List<BaseStackNodeView> stackNodeViews = new();
 
-		Dictionary<Type, OverlayView> pinnedElements = new();
-
 		CreateNodeMenuWindow createNodeMenu;
 
 
@@ -1270,12 +1268,11 @@ namespace GraphProcessor
 			AssetDatabase.SaveAssets();
 		}
 
-		public void ResetPositionAndZoom()
+		public void FitViewport()
 		{
-			graph.position = Vector3.zero;
-			graph.scale = Vector3.one;
-
-			UpdateViewTransform(graph.position, graph.scale);
+			FrameAll();
+			graph.position = contentViewContainer.transform.position;
+			graph.scale = contentViewContainer.transform.scale;
 		}
 
 		/// <summary>

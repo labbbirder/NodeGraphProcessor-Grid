@@ -15,7 +15,7 @@ namespace BBBirder.Graphs
 	/// </summary>
 	public abstract partial class LinearExecutionNode : BaseNode
 	{
-		[Input(name: "Executed", allowMultiple: true)]
+		[Input(name: "Executed")]
 		public ExecutionLink executed;
 
 		[Output(name: "Executes")]

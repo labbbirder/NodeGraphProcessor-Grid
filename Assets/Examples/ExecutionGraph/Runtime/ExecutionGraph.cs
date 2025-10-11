@@ -53,5 +53,22 @@ namespace BBBirder.Graphs
             this.onGraphChanges -= OnGraphChanges;
         }
 
+        protected override void PostprocessNewNodePort(bool input, NodePort port)
+        {
+            var type = port.portData.displayType ?? port.fieldInfo.FieldType;
+            if (type == typeof(ExecutionLink))
+            {
+                port.portData.acceptMultipleEdges = input;
+            }
+            else
+            {
+                port.portData.acceptMultipleEdges = port.portData.unpack;
+                if (port.portData.unpack)
+                {
+                    port.portData.displayType = RuntimeTypeCache.GetUnpackedElementType(type);
+                }
+            }
+        }
+
     }
 }

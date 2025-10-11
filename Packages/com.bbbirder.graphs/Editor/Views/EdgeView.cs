@@ -14,26 +14,52 @@ namespace GraphProcessor
 		public SerializableEdge serializedEdge { get { return userData as SerializableEdge; } }
 
 		protected BaseGraphView owner => ((input ?? output) as PortView).owner.GraphView;
-		Label label;
+		Label lblStart, lblEnd;
 
 		public EdgeView() : base()
 		{
 			styleSheets.Add(ResUtils.Load<StyleSheet>(edgeStylePath));
 			RegisterCallback<MouseDownEvent>(OnMouseDown);
-			this.Add(label = new Label("hi"));
-			// SetLabelState(false);
+			this.Add(lblEnd = new Label("hi"));
+			this.Add(lblStart = new Label("hi"));
+			SetLabelState(false, false);
+			SetLabelState(true, false);
 		}
 
-		private void SetLabelState(bool displayState)
+		internal void UpdateIndex(bool start, int i)
 		{
-			label.style.display = displayState ? DisplayStyle.Flex : DisplayStyle.None;
+			if (i == -1)
+			{
+				SetLabelState(start, false);
+				; (start ? lblStart : lblEnd).text = "";
+			}
+			else
+			{
+				SetLabelState(start, true);
+				; (start ? lblStart : lblEnd).text = i.ToString();
+			}
+		}
+
+		private void SetLabelState(bool start, bool displayState)
+		{
+			; (start ? lblStart : lblEnd).style.display =
+				displayState ? DisplayStyle.Flex : DisplayStyle.None;
+		}
+
+		internal void UpdateEdgeControlBase()
+		{
+			base.UpdateEdgeControl();
 		}
 
 		public override bool UpdateEdgeControl()
 		{
 			var result = base.UpdateEdgeControl();
-			label.style.left = edgeControl.from.x + 16;
-			label.style.top = edgeControl.from.y;
+			lblStart.style.left = edgeControl.from.x + 16;
+			lblStart.style.top = edgeControl.from.y;
+			lblEnd.style.left = edgeControl.to.x - 16 - lblEnd.localBound.width;
+			lblEnd.style.top = edgeControl.to.y;
+			; (input as PortView)?.UpdatePortSort();
+			; (output as PortView)?.UpdatePortSort();
 			return result;
 		}
 
@@ -74,7 +100,8 @@ namespace GraphProcessor
 				position += new Vector2(-10f, -28);
 				Vector2 mousePos = owner.ChangeCoordinatesTo(owner.contentViewContainer, position);
 
-				owner.AddRelayNode(input as PortView, output as PortView, mousePos);
+#warning TODO: fix relay node
+				// owner.AddRelayNode(input as PortView, output as PortView, mousePos);
 			}
 		}
 	}

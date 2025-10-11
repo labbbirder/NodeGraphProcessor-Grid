@@ -162,7 +162,7 @@ namespace GraphProcessor
 		internal bool HasCustomEnter => information.hasCustomEnter;
 		internal bool HasCustomMoveNext => information.hasCustomMoveNext;
 		internal bool HasCustomAfterPullDatas => information.hasCustomAfterPullDatas;
-		internal bool PullDataManually => false;
+		internal protected virtual bool PullDataManually => false;
 
 
 		public NodeStatus GetStatus(BaseGraph graph)
@@ -183,9 +183,25 @@ namespace GraphProcessor
 			AfterPullDatas();
 		}
 
-		internal void PullDataRecursively(string portName)
+		protected void PullPortData(NodePort inputPort)
 		{
-			graph.PullDatasRecursively(this, portName);
+			graph.PullDataRecursively(inputPort);
+		}
+
+		protected void PullPortData(string fieldName)
+		{
+			if (inputPorts.TryGetPorts(fieldName, out var ports))
+			{
+				foreach (var p in ports)
+				{
+					PullPortData(p);
+				}
+			}
+		}
+
+		protected void PullAllData()
+		{
+			graph.PullDataRecursively(this);
 		}
 
 		protected internal virtual void AfterPullDatas() { }
@@ -240,10 +256,6 @@ namespace GraphProcessor
 			LoadPorts();
 		}
 
-		/// <summary>
-		/// Use this function to initialize anything related to ports generation in your node
-		/// This will allow the node creation menu to correctly recognize ports that can be connected between nodes
-		/// </summary>
 		public void ReloadPorts()
 		{
 			using var _ = CollectionPool.Get<HashSet<NodePort>>(out var ports);
@@ -255,7 +267,7 @@ namespace GraphProcessor
 
 			LoadPorts();
 
-			foreach (var p in inputPorts)
+			foreach (var p in ports)
 			{
 				foreach (var e in p.GetEdges())
 				{
@@ -265,23 +277,25 @@ namespace GraphProcessor
 					e.outputPort.owner.OnEdgeConnected(e);
 				}
 			}
+
+			onPortsUpdated?.Invoke("");
 		}
 
-		protected void NotifyPortsUpdated(string fieldName)
-		{
-			onPortsUpdated?.Invoke(fieldName);
-		}
-
-		protected virtual void LoadPorts()
+		/// <summary>
+		/// Use this function to initialize anything related to ports generation in your node
+		/// This will allow the node creation menu to correctly recognize ports that can be connected between nodes
+		/// </summary>
+		protected internal virtual void LoadPorts()
 		{
 			foreach (var (name, nodeField) in ioFields)
 			{
 				if (nodeField.hide) continue;
 				AddPort(nodeField.input, nodeField.fieldName, new PortData
 				{
-					acceptMultipleEdges = nodeField.isMultiple,
+					// acceptMultipleEdges = nodeField.isMultiple,
 					displayName = nodeField.name,
 					tooltip = nodeField.tooltip,
+					unpack = nodeField.unpack,
 					vertical = nodeField.vertical
 				});
 			}
@@ -394,7 +408,7 @@ namespace GraphProcessor
 
 		public void EnqueueExecutionPort(string portName)
 		{
-			if (!outputPorts.TryGetPort(portName, out var ports))
+			if (!outputPorts.TryGetPorts(portName, out var ports))
 			{
 				throw new($"field {portName} not found in {this}");
 			}
@@ -428,7 +442,7 @@ namespace GraphProcessor
 			else
 				outputPorts.Add(port);
 
-			graph.PostprocessNewNodePort(port);
+			graph.PostprocessNewNodePort(input, port);
 			return port;
 		}
 

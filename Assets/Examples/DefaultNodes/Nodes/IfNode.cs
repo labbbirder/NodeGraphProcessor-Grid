@@ -9,7 +9,7 @@ using UnityEngine.Rendering;
 [System.Serializable, NodeMenuItem("Conditional/If"), NodeMenuItem("Conditional/Branch")]
 public partial class IfNode : BaseNode
 {
-	[Input(name: "Executed", allowMultiple: true)]
+	[Input(name: "Executed")]
 	public ExecutionLink executed;
 
 	[Input(name: "Condition")]

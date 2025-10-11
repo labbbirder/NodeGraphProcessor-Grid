@@ -410,24 +410,6 @@ namespace GraphProcessor
         protected virtual PortView CreatePortView(Direction direction, FieldInfo fieldInfo, PortData portData, BaseEdgeConnectorListener listener)
             => PortView.CreatePortView(direction, fieldInfo, portData, listener);
 
-        // public void InsertPortView(PortView portView, int index)
-        // {
-        //     if (portView.direction == Direction.Input)
-        //     {
-        //         if (portView.portData.vertical)
-        //             topPortContainer.Insert(index, portView);
-        //         else
-        //             inputContainer.Insert(index, portView);
-        //     }
-        //     else
-        //     {
-        //         if (portView.portData.vertical)
-        //             bottomPortContainer.Insert(index, portView);
-        //         else
-        //             outputContainer.Insert(index, portView);
-        //     }
-        // }
-
         public void RemovePortView(PortView pv)
         {
             // Remove all connected edges:
@@ -1056,7 +1038,12 @@ namespace GraphProcessor
 
         public override void BuildContextualMenu(ContextualMenuPopulateEvent evt)
         {
-            BuildAlignMenu(evt);
+            SetValuesForSelectedNodes();
+            if (selectedNodes.Count > 1)
+            {
+                BuildAlignMenu(evt);
+            }
+
             evt.menu.AppendAction("Open Node Script", (e) => OpenNodeScript(), OpenNodeScriptStatus);
             evt.menu.AppendAction("Open Node View Script", (e) => OpenNodeViewScript(), OpenNodeViewScriptStatus);
             evt.menu.AppendAction("Debug", (e) => ToggleDebug(), DebugStatus);

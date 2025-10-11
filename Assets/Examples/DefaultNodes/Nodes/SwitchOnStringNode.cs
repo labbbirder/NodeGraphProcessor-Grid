@@ -21,23 +21,18 @@ public partial class SwitchOnStringNode : BaseNode
 	[Output(name: "Out", hide: true)]
 	public ExecutionLink output;
 
-	[OnChange(nameof(OnOptionChange))]
+	[OnChange(nameof(ReloadPorts))]
 	[SerializeField, ShowInInspector]
 	private string[] options;
 
 	NodePort defaultPort;
 	Dictionary<string, NodePort> optionPorts = new();
 
-	void OnOptionChange()
-	{
-		ReloadPorts();
-		NotifyPortsUpdated(nameof(output));
-	}
-
 	protected override void LoadPorts()
 	{
 		base.LoadPorts();
 
+		optionPorts.Clear();
 		if (options != null)
 		{
 			foreach (var opt in options)

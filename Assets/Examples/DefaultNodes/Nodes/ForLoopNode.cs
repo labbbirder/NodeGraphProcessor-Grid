@@ -8,7 +8,7 @@ using UnityEngine;
 [System.Serializable, NodeMenuItem("Conditional/ForLoop")]
 public partial class ForLoopNode : BaseNode
 {
-    [Input(name: "Executed", allowMultiple: true)]
+    [Input(name: "Executed")]
     public ExecutionLink executed;
 
     [Output(name: "Loop Body")]

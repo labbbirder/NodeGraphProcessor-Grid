@@ -23,10 +23,13 @@ namespace GraphProcessor
         /// </summary>
         public string identifier;
 
-        /// <summary>
-        /// The index of partial port. -1 means solo port.
-        /// </summary>
-        public int partialIndex = -1;
+        // /// <summary>
+        // /// The index of partial port. -1 means solo port.
+        // /// </summary>
+        // public int partialIndex = -1;
+        public bool sort;
+
+        public bool unpack;
 
         /// <summary>
         /// Display name on the node
@@ -56,6 +59,9 @@ namespace GraphProcessor
         public bool Equals(PortData other)
         {
             return identifier == other.identifier
+                && unpack == other.unpack
+                && sort == other.sort
+                // && partialIndex == other.partialIndex
                 && displayName == other.displayName
                 && displayType == other.displayType
                 && acceptMultipleEdges == other.acceptMultipleEdges
@@ -67,6 +73,9 @@ namespace GraphProcessor
         public void CopyFrom(PortData other)
         {
             identifier = other.identifier;
+            unpack = other.unpack;
+            sort = other.sort;
+            // partialIndex = other.partialIndex;
             displayName = other.displayName;
             displayType = other.displayType;
             acceptMultipleEdges = other.acceptMultipleEdges;
@@ -99,6 +108,10 @@ namespace GraphProcessor
         public PortData portData;
         List<SerializableEdge> edges = new List<SerializableEdge>();
 
+
+        Action<NodePort, int> packTransfer;
+        Action<SerializableEdge> soloTransfer;
+
         // Comparison<SerializableEdge> horizontalEdgeSorter = HorizontalEdgeSorter;
         // Comparison<SerializableEdge> verticalEdgeSorter;
         // public void SortEdges()
@@ -117,6 +130,12 @@ namespace GraphProcessor
         // {
         //     if(lhs.ou)
         // }
+
+        public void ClearRuntimeCache()
+        {
+            soloTransfer = null;
+            packTransfer = null;
+        }
 
         static Dictionary<(FieldInfo, Type), Delegate> s_typedGetters = new();
         private static Delegate GetNodeFieldGetter(FieldInfo fieldInfo, Type valueType)
@@ -158,65 +177,75 @@ namespace GraphProcessor
             return GetNodeFieldSetter(fieldInfo, typeof(T)) as Action<BaseNode, T>;
         }
 
-        private enum CollectionMetatype
+        private Action<SerializableEdge> CreateSoloTransfer()
         {
-            Element,    // not regarded as a collection
-            List,       // implements IList`1, can perform partial pull
-            Array,      // is T[], can perform partial pull
-            Collection, // implements ICollection`1, can only perform entirely pull
+            var edge = edges[0];
+            var key = (fieldInfo, edge.outputPort.fieldInfo);
+            if (!s_dataTransfers.TryGetValue(key, out var transFunc))
+            {
+                s_miSoloTransferHelper ??= GetType().GetMethod(nameof(SoloTransferHelper), BindingFlags.Static | BindingFlags.NonPublic);
+                s_dataTransfers[key] = transFunc = s_miSoloTransferHelper
+                    .MakeGenericMethod(fieldInfo.FieldType)
+                    .Invoke(null, new object[] { edge }) as Action<SerializableEdge>;
+            }
+
+            return transFunc;
         }
 
-        // Action<NodePort> cachedPullMethod;
-        // private Action<NodePort> GetPullMethod()
-        // {
-        //     var fieldType = fieldInfo.FieldType;
-        //     var collectionMetatype = !portData.unpack ? CollectionMetatype.Element
-        //         : fieldType.IsArray ? CollectionMetatype.Array
-        //         : HasImplement(fieldType, typeof(IList<>)) ? CollectionMetatype.List
-        //         : HasImplement(fieldType, typeof(ICollection<>)) ? CollectionMetatype.Collection
-        //         : CollectionMetatype.Element;
+        private Action<NodePort, int> CreatePackTransfer()
+        {
+            s_miPackTransferHelper ??= GetType().GetMethod(nameof(PackTransferHelper), BindingFlags.Static | BindingFlags.NonPublic);
+            var targetType = fieldInfo.FieldType;
+            var collectionMetatype = RuntimeTypeCache.GetCollectionMetatype(targetType);
+            if (collectionMetatype is CollectionMetatype.Element)
+            {
+                throw new($"Type {targetType} is not unpackable.");
+            }
 
+            var eleType = RuntimeTypeCache.GetUnpackedElementType(targetType);
+            return s_miPackTransferHelper
+                .MakeGenericMethod(targetType, eleType)
+                .Invoke(null, new object[] { this, collectionMetatype }) as Action<NodePort, int>;
+        }
 
+        static MethodInfo s_miSoloTransferHelper;
+        static Dictionary<(FieldInfo, FieldInfo), Action<SerializableEdge>> s_dataTransfers = new(new FieldPairComparer());
+        private static Action<SerializableEdge> SoloTransferHelper<TTo>(SerializableEdge edge)
+        {
+            var getter = GetNodeFieldGetter<TTo>(edge.outputPort.fieldInfo);
+            var setter = GetNodeFieldSetter<TTo>(edge.inputPort.fieldInfo);
+            return (e) =>
+            {
+                // Assert: e == edge
+                var value = getter(e.outputNode);
+                setter(e.inputNode, value);
+            };
+        }
 
-        //     static bool HasImplement(Type type, Type interfType)
-        //     {
-        //         foreach (var t in type.GetInterfaces())
-        //         {
-        //             if (t.IsGenericType)
-        //             {
-        //                 if (t.GetGenericTypeDefinition() == interfType)
-        //                     return true;
-        //             }
-        //             else
-        //             {
-        //                 if (t == interfType)
-        //                     return true;
-        //             }
-        //         }
-
-        //         return false;
-        //     }
-        // }
-
-        private static Action<BaseNode> GenericPullFactory<TCollection, TElement>(NodePort inputPort, int edgeIndex = -1)
+        static MethodInfo s_miPackTransferHelper;
+        private static Action<NodePort, int> PackTransferHelper<TCollection, TElement>(NodePort inputPort, CollectionMetatype collectionMetatype) where TCollection : class
         {
             var edges = inputPort.edges;
             var fieldInfo = inputPort.fieldInfo;
 
-            var cnt = edges.Count;
-            var getters = edges
-                .Select(e => (GetNodeFieldGetter<TElement>(e.outputPort.fieldInfo), e.outputNode))
-                .ToArray();
+            // var getters = edges
+            //     .Select(e => (GetNodeFieldGetter<TElement>(e.outputPort.fieldInfo), e.outputNode))
+            //     .ToArray();
+
+#warning TODO: expose getter as well.
             var setter = GetNodeFieldSetter<TCollection>(fieldInfo);
-            if (typeof(IList<TElement>).IsAssignableFrom(typeof(TCollection)))
+            if (collectionMetatype is CollectionMetatype.List)
             {
-                return (node) =>
+                return (port, edgeIndex) =>
                 {
+                    var cnt = edges.Count;
+                    var node = port.owner;
+
                     var list = fieldInfo.GetValue(node) as IList<TElement>;
                     if (list is null)
                     {
                         list = Activator.CreateInstance(fieldInfo.FieldType) as IList<TElement>;
-                        fieldInfo.SetValue(node, list);
+                        setter(node, list as TCollection);
                     }
 
                     if (list.Count != cnt)
@@ -232,48 +261,120 @@ namespace GraphProcessor
                     {
                         for (int i = 0; i < cnt; i++)
                         {
-                            var (getter, n) = getters[i];
-                            list[i] = getter(n);
+                            var edge = edges[i];
+                            list[i] = PullFromEdge(edge);
                         }
                     }
                     else
                     {
-                        var (getter, n) = getters[edgeIndex];
-                        list[edgeIndex] = getter(n);
+                        var edge = edges[edgeIndex];
+                        list[edgeIndex] = PullFromEdge(edge);
                     }
                 };
             }
-            else if (typeof(TCollection).IsArray)
+            else if (collectionMetatype is CollectionMetatype.Array)
             {
-                return (node) =>
+                return (port, edgeIndex) =>
                 {
+                    var cnt = edges.Count;
+                    var node = port.owner;
+
                     var arr = fieldInfo.GetValue(node) as TElement[];
                     if (arr is null || arr.Length != cnt)
                     {
                         arr = new TElement[cnt];
+                        setter(node, arr as TCollection);
                     }
 
                     if (edgeIndex == -1)
                     {
                         for (int i = 0; i < cnt; i++)
                         {
-                            var (getter, n) = getters[i];
-                            arr[i] = getter(n);
+                            var edge = edges[i];
+                            arr[i] = PullFromEdge(edge);
                         }
                     }
                     else
                     {
-                        var (getter, n) = getters[edgeIndex];
-                        arr[edgeIndex] = getter(n);
+                        var edge = edges[edgeIndex];
+                        arr[edgeIndex] = PullFromEdge(edge);
+                    }
+                };
+            }
+            else if (collectionMetatype is CollectionMetatype.Collection)
+            {
+                return (port, edgeIndex) =>
+                {
+                    var cnt = edges.Count;
+                    var node = port.owner;
+
+                    var container = fieldInfo.GetValue(node) as ICollection<TElement>;
+
+                    if (container is null)
+                    {
+                        container = Activator.CreateInstance(fieldInfo.FieldType) as ICollection<TElement>;
+                        setter(node, container as TCollection);
+                    }
+
+                    container.Clear();
+
+                    foreach (var edge in edges)
+                    {
+                        container.Add(PullFromEdge(edge));
                     }
                 };
             }
             else
             {
                 throw new NotSupportedException($"type {typeof(TCollection)}");
+                var edge = edges[0];
+                var getter = GetNodeFieldGetter<TCollection>(edge.outputPort.fieldInfo);
+                return (port, edgeIndex) =>
+                {
+                    var node = port.owner;
+                    var nfrom = port.edges[0].outputNode;
+
+                    setter(node, getter(nfrom));
+                };
+            }
+
+            static TElement PullFromEdge(SerializableEdge edge)
+            {
+                var getter = GetNodeFieldGetter<TElement>(edge.outputPort.fieldInfo);
+                return getter.Invoke(edge.outputNode);
             }
         }
 
+        private class FieldPairComparer : IEqualityComparer<(FieldInfo, FieldInfo)>
+        {
+            private static bool IsMemberEquals(MemberInfo lhs, MemberInfo rhs)
+            {
+                if (ReferenceEquals(lhs, rhs)) return true;
+
+                if (lhs is null || rhs is null) return false;
+
+                if (lhs.MetadataToken != rhs.MetadataToken) return false;
+
+                if (lhs.Module.MetadataToken != rhs.Module.MetadataToken) return false;
+
+                return true;
+            }
+
+            public bool Equals((FieldInfo, FieldInfo) lhs, (FieldInfo, FieldInfo) rhs)
+            {
+                return IsMemberEquals(lhs.Item1, rhs.Item1)
+                    && IsMemberEquals(lhs.Item2, rhs.Item2)
+                    ;
+            }
+
+            public int GetHashCode((FieldInfo, FieldInfo) obj)
+            {
+                var hash = 17;
+                hash = hash * 23 + obj.Item1.MetadataToken;
+                hash = hash * 23 + obj.Item2.MetadataToken;
+                return hash;
+            }
+        }
 
         /// <summary>
         /// Constructor
@@ -347,30 +448,20 @@ namespace GraphProcessor
         /// Pull values from the edge (in case of a custom convertion method)
         /// This method can only be called on input ports
         /// </summary>
-        public void PullData()
+        internal void PullData()
         {
-            // Only one input connection is handled by this code, if you want to
-            // take multiple inputs, you must create a custom input function see CustomPortsNode.cs
             if (edges.Count > 0)
             {
-                // if (!isArray)
+                if (portData.unpack)
                 {
-                    var edge = edges.First();
-                    edge.TransferFunc.Invoke(edge.outputNode, edge.inputNode);
+                    packTransfer ??= CreatePackTransfer();
+                    packTransfer.Invoke(this, -1);
                 }
-                // else
-                // {
-                //     // init port array
-                //     // fieldInfo.SetValue()
-                //     foreach (var edge in edges)
-                //     {
-
-                //     }
-                // }
-                // var data = edge.outputPort.fieldInfo.GetValue(edge.outputNode);
-                // // We do an extra convertion step in case the buffer output is not compatible with the input port
-                // RuntimeConverter.TryConvert(data, fieldInfo.FieldType, out var convertedValue);
-                // fieldInfo.SetValue(fieldOwner, convertedValue);
+                else
+                {
+                    soloTransfer ??= CreateSoloTransfer();
+                    soloTransfer.Invoke(edges[0]);
+                }
             }
         }
     }
@@ -456,7 +547,7 @@ namespace GraphProcessor
             base.Clear();
         }
 
-        public bool TryGetPort(string fieldName, out ReadOnlyList<NodePort> ports)
+        public bool TryGetPorts(string fieldName, out ReadOnlyList<NodePort> ports)
         {
             var found = lut.TryGetValue(fieldName, out var results);
             ports = found ? results.ToReadOnly() : default;

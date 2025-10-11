@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace GraphProcessor
 {
-    internal static class RuntimeTypeCache
+    public static class RuntimeTypeCache
     {
         private static Dictionary<Type, FieldInfo[]> s_node2allInstanceFields = new();
 
@@ -53,10 +53,10 @@ namespace GraphProcessor
             return fieldInfos;
         }
 
-        public static Dictionary<Type, NodeInformation> s_node2nodeInformation = new();
+        static Dictionary<Type, NodeInformation> s_node2nodeInformation = new();
         const BindingFlags InstanceFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 
-        public static NodeInformation GetNodeInformation(Type nodeType)
+        internal static NodeInformation GetNodeInformation(Type nodeType)
         {
 
             var fields = GetNodeInstantceFieldInfos(nodeType);
@@ -72,7 +72,7 @@ namespace GraphProcessor
                     var tooltipAttribute = field.GetCustomAttribute<TooltipAttribute>();
                     var showInInspector = field.GetCustomAttribute<ShowInInspector>();
                     var vertical = field.GetCustomAttribute<VerticalAttribute>();
-                    bool isMultiple = false;
+                    bool unpack = false;
                     bool isHide = false;
                     bool input = false;
                     string name = field.Name;
@@ -87,18 +87,18 @@ namespace GraphProcessor
                         continue;
 
                     //check if field is a collection type
-                    isMultiple = (inputAttribute != null) ? inputAttribute.allowMultiple : outputAttribute.allowMultiple;
-                    isHide = (inputAttribute != null) ? inputAttribute.hide : outputAttribute.hide;
+                    unpack = (inputAttribute != null) ? inputAttribute.Unpack : outputAttribute.Unpack;
+                    isHide = (inputAttribute != null) ? inputAttribute.Hide : outputAttribute.hide;
                     input = inputAttribute != null;
                     tooltip = tooltipAttribute?.tooltip;
 
-                    if (!string.IsNullOrEmpty(inputAttribute?.name))
-                        name = inputAttribute.name;
+                    if (!string.IsNullOrEmpty(inputAttribute?.Name))
+                        name = inputAttribute.Name;
                     if (!string.IsNullOrEmpty(outputAttribute?.name))
                         name = outputAttribute.name;
 
                     // By default we set the behavior to null, if the field have a custom behavior, it will be set in the loop just below
-                    ioFields[field.Name] = new NodeFieldInformation(field, name, input, isMultiple, tooltip, vertical != null)
+                    ioFields[field.Name] = new NodeFieldInformation(field, name, input, unpack, tooltip, vertical != null)
                     {
                         hide = isHide
                     };
@@ -122,6 +122,71 @@ namespace GraphProcessor
             }
         }
 
+        static Dictionary<Type, CollectionMetatype> s_collectionMetatypes = new();
+
+        internal static CollectionMetatype GetCollectionMetatype(Type type)
+        {
+            if (!s_collectionMetatypes.TryGetValue(type, out var metatype))
+            {
+                s_collectionMetatypes[type] = metatype = type.IsArray ? CollectionMetatype.Array
+                    : HasImplement(type, typeof(IList<>)) ? CollectionMetatype.List
+                    : HasImplement(type, typeof(ICollection<>)) ? CollectionMetatype.Collection
+                    : CollectionMetatype.Element;
+            }
+
+            return metatype;
+
+            static bool HasImplement(Type type, Type interfType)
+            {
+                foreach (var t in type.GetInterfaces())
+                {
+                    if (t.IsGenericType)
+                    {
+                        if (t.GetGenericTypeDefinition() == interfType)
+                            return true;
+                    }
+                    else
+                    {
+                        if (t == interfType)
+                            return true;
+                    }
+                }
+
+                return false;
+            }
+        }
+
+        static Dictionary<Type, Type> s_unpackedElementTypes = new();
+        public static Type GetUnpackedElementType(Type type)
+        {
+            if (!s_unpackedElementTypes.TryGetValue(type, out var eleType))
+            {
+                s_unpackedElementTypes[type] = eleType = GetCollectionMetatype(type) switch
+                {
+                    CollectionMetatype.List => GetGenericArgumentOfInterface(type, typeof(IList<>)),
+                    CollectionMetatype.Collection => GetGenericArgumentOfInterface(type, typeof(ICollection<>)),
+                    CollectionMetatype.Array => type.GetElementType(),
+                    _ => null,
+                };
+            }
+
+            return eleType;
+
+            static Type GetGenericArgumentOfInterface(Type type, Type interfType)
+            {
+                foreach (var t in type.GetInterfaces())
+                {
+                    if (t.IsGenericType)
+                    {
+                        if (t.GetGenericTypeDefinition() == interfType)
+                            return t.GenericTypeArguments[0];
+                    }
+                }
+
+                return null;
+            }
+        }
+
         internal class NodeInformation
         {
             public bool needsInspector;
@@ -137,16 +202,16 @@ namespace GraphProcessor
             public string fieldName;
             public FieldInfo info;
             public bool input;
-            public bool isMultiple;
+            public bool unpack;
             public bool hide;
             public string tooltip;
             // public CustomPortBehaviorDelegate behavior;
             public bool vertical;
 
-            public NodeFieldInformation(FieldInfo info, string name, bool input, bool isMultiple, string tooltip, bool vertical)
+            public NodeFieldInformation(FieldInfo info, string name, bool input, bool unpack, string tooltip, bool vertical)
             {
                 this.input = input;
-                this.isMultiple = isMultiple;
+                this.unpack = unpack;
                 this.info = info;
                 this.name = name;
                 this.fieldName = info.Name;
@@ -156,5 +221,14 @@ namespace GraphProcessor
             }
         }
     }
+
+    internal enum CollectionMetatype
+    {
+        Element,    // not regarded as a collection
+        List,       // implements IList`1, can perform partial pull
+        Array,      // is T[], can perform partial pull
+        Collection, // implements ICollection`1, can only perform entirely pull
+    }
+
 }
 

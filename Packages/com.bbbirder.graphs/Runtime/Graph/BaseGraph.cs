@@ -160,6 +160,11 @@ namespace GraphProcessor
 			onEnabled?.Invoke();
 		}
 
+		internal void SortEdges()
+		{
+			edges.Sort()
+		}
+
 		protected internal virtual void Deinitialize()
 		{
 			if (!_isInitialized) return;
@@ -249,7 +254,7 @@ namespace GraphProcessor
 					{
 						if (node.HasCustomEnter)
 						{
-							PullDatasRecursively(node);
+							PullDataRecursively(node);
 							node.Enter();
 						}
 					}
@@ -306,7 +311,7 @@ namespace GraphProcessor
 
 			if (n.HasCustomMoveNext)
 			{
-				PullDatasRecursively(n);
+				PullDataRecursively(n);
 				try
 				{
 					var reenter = n.MoveNext();
@@ -390,6 +395,14 @@ namespace GraphProcessor
 			dataFlowReversedDirections.Clear();
 			dataFlowDeterministics.Clear();
 			dataflowDependenciesMatrix.Clear();
+
+			foreach (var node in nodes)
+			{
+				foreach (var port in node.inputPorts)
+				{
+					port.ClearRuntimeCache();
+				}
+			}
 		}
 
 		public HashSet<BaseNode> GetDataFlowDirections(BaseNode node)
@@ -487,19 +500,19 @@ namespace GraphProcessor
 			return deterministic;
 		}
 
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="targetNode"></param>
-		/// <param name="fieldName">Null means all ports</param>
-		public void PullDatasRecursively(BaseNode targetNode, string fieldName = null)
+		internal void PullDataRecursively(NodePort inputPort)
 		{
-			ReadOnlyList<NodePort> ports = default;
-			if (!string.IsNullOrEmpty(fieldName))
+			foreach (var e in inputPort.GetEdges())
 			{
-				targetNode.inputPorts.TryGetPort(fieldName, out ports);
+				var n = e.outputNode;
+				PullDataRecursively(n);
 			}
 
+			inputPort.PullData();
+		}
+
+		internal void PullDataRecursively(BaseNode targetNode)
+		{
 			bool first;
 
 			// Compute dependencies
@@ -511,22 +524,8 @@ namespace GraphProcessor
 				using var _1 = CollectionPool.Get<Dictionary<BaseNode, int>>(out var indegrees);
 				using var _2 = CollectionPool.Get<Queue<BaseNode>>(out var waveFront);
 				using var _3 = CollectionPool.Get<Queue<BaseNode>>(out var echoFront);
-				if (ports.HasValue)
-				{
-					foreach (var port in ports)
-					{
-						foreach (var e in port.GetEdges())
-						{
-							var n = e.outputNode;
-							if (!waveFront.Contains(n))
-								waveFront.Enqueue(n);
-						}
-					}
-				}
-				else
-				{
-					waveFront.Enqueue(targetNode);
-				}
+
+				waveFront.Enqueue(targetNode);
 
 				while (waveFront.TryDequeue(out var node))
 				{
@@ -607,23 +606,12 @@ namespace GraphProcessor
 			{
 				foreach (var n in dependencies) n.PullDatas();
 			}
-
-			if (ports.HasValue)
-			{
-				foreach (var port in ports)
-				{
-					port.PullData();
-				}
-			}
 		}
 
 		/// <summary>
 		/// Do some graph elements correction jobs here.
 		/// </summary>
-		internal protected virtual void BeforeSaveToDisk()
-		{
-
-		}
+		internal protected virtual void BeforeSaveToDisk() { }
 
 		public virtual void OnAssetDeleted() { }
 
@@ -852,7 +840,7 @@ namespace GraphProcessor
 
 		public void OnAfterDeserialize() { }
 
-		internal protected virtual void PostprocessNewNodePort(NodePort port) { }
+		internal protected virtual void PostprocessNewNodePort(bool input, NodePort port) { }
 
 		/// <summary>
 		/// Add an exposed parameter

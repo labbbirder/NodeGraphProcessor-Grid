@@ -49,8 +49,30 @@ namespace GraphProcessor
 
             root.Add(new ToolbarSpacer());
 
+
+            var btnFit = new EditorToolbarButton(ResUtils.Load<Texture2D>("../res/Icons/material-symbols--fit-screen.png"), () =>
+            {
+                Window.graphView.FitViewport();
+            })
+            {
+                tooltip = "Fit Viewport"
+            };
+            root.Add(btnFit);
+
+            var btnSnapGrid = new EditorToolbarToggle(ResUtils.Load<Texture2D>("../res/Icons/dinkie-icons--grid.png"))
+            {
+                tooltip = "Snap Grid"
+            };
+            btnSnapGrid.RegisterValueChangedCallback(e =>
+            {
+            });
+            root.Add(btnSnapGrid);
+
+            root.Add(new ToolbarSpacer());
+
             var btnRun = new EditorToolbarButton(ResUtils.Load<Texture2D>("../res/Icons/mdi--play.png"), () =>
             {
+                Window.Graph.ClearRuntimeCache();
                 Window.Graph.Run();
             })
             {
@@ -75,6 +97,10 @@ namespace GraphProcessor
                 tooltip = "Stop"
             };
             root.Add(btnStop);
+
+
+            root.Add(new ToolbarSpacer());
+
 
             return root;
         }

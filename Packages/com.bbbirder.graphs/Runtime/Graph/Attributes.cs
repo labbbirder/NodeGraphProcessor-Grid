@@ -20,20 +20,20 @@ namespace GraphProcessor
 	[AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
 	public class InputAttribute : Attribute
 	{
-		public readonly string name;
-		public readonly bool hide;
-		public readonly bool allowMultiple = false;
+		public readonly string Name;
+		public readonly bool Hide;
+		public readonly bool Unpack;
 
 		/// <summary>
 		/// Mark the field as an input port
 		/// </summary>
 		/// <param name="name">display name</param>
-		/// <param name="allowMultiple">is connecting multiple edges allowed</param>
-		public InputAttribute(string name = null, bool allowMultiple = false, bool hide = false)
+		/// <param name="unpack">unpack array to elements</param>
+		public InputAttribute(string name = null, bool unpack = false, bool hide = false)
 		{
-			this.name = name;
-			this.hide = hide;
-			this.allowMultiple = allowMultiple;
+			this.Name = name;
+			this.Hide = hide;
+			this.Unpack = unpack;
 		}
 	}
 
@@ -45,18 +45,18 @@ namespace GraphProcessor
 	{
 		public readonly string name;
 		public readonly bool hide;
-		public readonly bool allowMultiple = true;
+		public readonly bool Unpack;
 
 		/// <summary>
 		/// Mark the field as an output port
 		/// </summary>
 		/// <param name="name">display name</param>
-		/// <param name="allowMultiple">is connecting multiple edges allowed</param>
-		public OutputAttribute(string name = null, bool allowMultiple = true, bool hide = false)
+		/// <param name="unpack">unpack array to elements</param>
+		public OutputAttribute(string name = null, bool unpack = true, bool hide = false)
 		{
 			this.name = name;
 			this.hide = hide;
-			this.allowMultiple = allowMultiple;
+			this.Unpack = unpack;
 		}
 	}
 

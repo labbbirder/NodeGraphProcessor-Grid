@@ -19,18 +19,11 @@ public partial class Add2 : BaseNode
     }
 }
 
-[System.Serializable, NodeMenuItem("Custom/Fin")]
-public partial class Fin : LinearExecutionNode
-{
-    [Input] public float a;
-
-}
-
 [System.Serializable, NodeMenuItem("Custom/MultiAdd")]
 public partial class MultiAddNode : BaseNode
 {
-    [Input]
-    public IEnumerable<float> inputs = null;
+    [Input(unpack: true)]
+    public float[] inputs;
 
     [Output, ShowAsDrawer]
     public float output;
@@ -47,6 +40,15 @@ public partial class MultiAddNode : BaseNode
     //     foreach (float input in inputs)
     //         output += input;
     // }
+
+    protected override void AfterPullDatas()
+    {
+        output = 0;
+        foreach (var n in inputs)
+        {
+            output += n;
+        }
+    }
 
     // [CustomPortBehavior(nameof(inputs))]
     // IEnumerable<PortData> GetPortsForInputs(List<SerializableEdge> edges)

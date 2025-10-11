@@ -6,20 +6,17 @@ using BBBirder;
 using GraphProcessor;
 using UnityEngine;
 
-
-
-[System.Serializable, NodeMenuItem("Conditional/Switch On Int")]
-public partial class SwitchOnIntNode : BaseNode
+[System.Serializable, NodeMenuItem("Conditional/Select On Int")]
+public partial class SelectOnIntNode : BaseNode
 {
-	public override string name => "Switch On Int";
-	[Input]
-	public ExecutionLink executed;
-
 	[Input(name: "In")]
 	public int input;
 
-	[Output(name: "Out", hide: true)]
-	public ExecutionLink output;
+	[Input(hide: true)]
+	public object selected;
+
+	[Output(name: "Out")]
+	public object result;
 
 	[OnChange(nameof(ReloadPorts))]
 	[SerializeField, ShowInInspector]
@@ -28,6 +25,8 @@ public partial class SwitchOnIntNode : BaseNode
 	NodePort defaultPort;
 	Dictionary<int, NodePort> optionPorts = new();
 
+	protected override bool PullDataManually => true;
+	public override string name => "Select On Int";
 
 	protected override void LoadPorts()
 	{
@@ -38,34 +37,36 @@ public partial class SwitchOnIntNode : BaseNode
 		{
 			foreach (var opt in options)
 			{
-				optionPorts[opt] = AddPort(false, $"output", new PortData()
+				optionPorts[opt] = AddPort(true, $"selected", new PortData()
 				{
 					identifier = opt.ToString(),
 					displayName = opt.ToString(),
-					displayType = typeof(ExecutionLink),
 				});
 			}
 		}
 
-		defaultPort = AddPort(false, $"output", new PortData()
+		defaultPort = AddPort(true, $"selected", new PortData()
 		{
 			identifier = "default",
 			displayName = "default",
-			displayType = typeof(ExecutionLink),
 		});
 	}
 
-	public override bool MoveNext()
+	protected override void AfterPullDatas()
 	{
+		PullPortData(nameof(input));
+
+		selected = default;
 		if (optionPorts.TryGetValue(input, out var port))
 		{
-			EnqueueExecutionPort(port);
+			PullPortData(port);
 		}
 		else
 		{
-			EnqueueExecutionPort(defaultPort);
+			PullPortData(defaultPort);
 		}
 
-		return false;
+		result = selected;
 	}
+
 }
