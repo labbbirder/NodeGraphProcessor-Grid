@@ -45,18 +45,16 @@ namespace GraphProcessor
 	{
 		public readonly string name;
 		public readonly bool hide;
-		public readonly bool Unpack;
 
 		/// <summary>
 		/// Mark the field as an output port
 		/// </summary>
 		/// <param name="name">display name</param>
 		/// <param name="unpack">unpack array to elements</param>
-		public OutputAttribute(string name = null, bool unpack = true, bool hide = false)
+		public OutputAttribute(string name = null, bool hide = false)
 		{
 			this.name = name;
 			this.hide = hide;
-			this.Unpack = unpack;
 		}
 	}
 

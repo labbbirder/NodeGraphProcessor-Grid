@@ -14,14 +14,7 @@ namespace BBBirder.Graphs
         protected override BaseNode EntryNode => startNodes.FirstOrDefault();
         [SerializeReference] private List<BaseNode> startNodes = new();
 
-        protected override void Initialize()
-        {
-            this.onGraphChanges -= OnGraphChanges;
-            this.onGraphChanges += OnGraphChanges;
-            base.Initialize();
-        }
-
-        private void OnGraphChanges(GraphChanges e)
+        protected override void OnGraphChanges(GraphChanges e)
         {
             if (e.addedNode is IStartNode)
             {
@@ -48,10 +41,9 @@ namespace BBBirder.Graphs
             base.BeforeSaveToDisk();
         }
 
-        protected override void Deinitialize()
+        protected override void PostprocessNewNodePort(bool input, NodePort port)
         {
-            base.Deinitialize();
-            this.onGraphChanges -= OnGraphChanges;
+            port.portData.acceptMultipleEdges = true;
         }
 
     }

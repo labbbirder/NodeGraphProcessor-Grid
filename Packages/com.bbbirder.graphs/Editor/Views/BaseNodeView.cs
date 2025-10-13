@@ -882,7 +882,7 @@ namespace GraphProcessor
             {
                 UpdateFieldVisibility(field.Name, field.GetValue(nodeTarget));
                 valueChangedCallback?.Invoke();
-                NotifyNodeChanged();
+                NotifyNodeContentChanged();
             });
 
             element.RegisterCallback<FocusOutEvent>(e =>
@@ -1004,8 +1004,22 @@ namespace GraphProcessor
 
         // TODO: a function to force to reload the custom behavior ports (if we want to do a button to add ports for example)
 
-        public virtual void OnRemoved() { }
-        public virtual void OnCreated() { }
+        public void OnRemovedInternal()
+        {
+            nodeTarget.graph.MakeNodeSortDirty();
+            GraphView.DelayToResortEdges("On Node Remove");
+            OnRemoved();
+        }
+
+        public void OnCreatedInternal()
+        {
+            nodeTarget.graph.MakeNodeSortDirty();
+            GraphView.DelayToResortEdges("On Node Add");
+            OnCreated();
+        }
+
+        protected virtual void OnRemoved() { }
+        protected virtual void OnCreated() { }
 
         public override void SetPosition(Rect newPos)
         {
@@ -1017,6 +1031,9 @@ namespace GraphProcessor
                     GraphView.RegisterCompleteObjectUndo("Moved graph node");
 
                 nodeTarget.position = newPos;
+                nodeTarget.graph.MakeNodeSortDirty();
+                GraphView.DelayToResortEdges("On Node SetPosition");
+
                 initializing = false;
             }
         }
@@ -1150,7 +1167,7 @@ namespace GraphProcessor
         /// <summary>
         /// Send an event to the graph telling that the content of this node have changed
         /// </summary>
-        public void NotifyNodeChanged() => GraphView.graph.NotifyNodeChanged(nodeTarget);
+        public void NotifyNodeContentChanged() => GraphView.graph.NotifyNodeContentChanged(nodeTarget);
 
         public void NotifyNodeFocusOutInEditor() => GraphView.graph.NotifyNodeFocusOutInEditor(nodeTarget);
 

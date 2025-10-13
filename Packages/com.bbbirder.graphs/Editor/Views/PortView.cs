@@ -167,42 +167,12 @@ namespace GraphProcessor
 			{
 				foreach (var edge in edges)
 				{
-					edge.UpdateEdgeControlBase();
+					edge.UpdateEdgeControl();
 					edge.MarkDirtyRepaint();
 				}
 			}).ExecuteLater(50); // Hummm
 
 			UpdatePortSize();
-		}
-
-		public void UpdatePortSort()
-		{
-			var input = direction == Direction.Input;
-			var vertical = orientation == Orientation.Vertical;
-			edges.Sort((l, r) =>
-			{
-				var pl = input ? l.edgeControl.from : l.edgeControl.to;
-				var pr = input ? r.edgeControl.from : r.edgeControl.to;
-				var vl = vertical ? pl.x : pl.y;
-				var vr = vertical ? pr.x : pr.y;
-				return vl - vr > 0 ? 1 : -1;
-			});
-
-			if (edges.Count > 1)
-			{
-				int i = 0;
-				foreach (var ev in edges)
-				{
-					ev.UpdateIndex(input, ++i);
-				}
-			}
-			else
-			{
-				foreach (var ev in edges)
-				{
-					ev.UpdateIndex(input, -1);
-				}
-			}
 		}
 
 		public List<EdgeView> GetEdges()

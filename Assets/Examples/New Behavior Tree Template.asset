@@ -14,21 +14,54 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   graph:
     nodes:
-    - rid: 5309892629070610493
     - rid: 5309892629070610674
     - rid: 5309892629070610675
-    edges: []
+    - rid: 5309892695148987184
+    - rid: 5309892695148987185
+    - rid: 5309892695148987186
+    edges:
+    - GUID: 941743e3-83c1-4ec9-99a0-9267de11a4c5
+      inputNodeGUID: c14028bd-f917-4292-8972-3f66e884e2e2
+      outputNodeGUID: e30ba957-5c38-4c37-9cca-8507352b22c1
+      inputFieldName: executed
+      outputFieldName: executes
+      inputPortIdentifier: 
+      outputPortIdentifier: 
+    - GUID: 9906797f-5928-4060-8565-2ac49fa91e0c
+      inputNodeGUID: f7a4933b-e6f8-4da8-8c5c-e6323304d9c8
+      outputNodeGUID: e30ba957-5c38-4c37-9cca-8507352b22c1
+      inputFieldName: executed
+      outputFieldName: executes
+      inputPortIdentifier: 
+      outputPortIdentifier: 
+    - GUID: 7d8ae41c-fcb1-4207-9490-4bd9da5adb32
+      inputNodeGUID: 8938e3fe-a45e-44be-9f78-0430ad20412c
+      outputNodeGUID: e30ba957-5c38-4c37-9cca-8507352b22c1
+      inputFieldName: executed
+      outputFieldName: executes
+      inputPortIdentifier: 
+      outputPortIdentifier: 
+    - GUID: 9de4eb40-8b3c-44f4-a382-32d0108bc6bd
+      inputNodeGUID: e30ba957-5c38-4c37-9cca-8507352b22c1
+      outputNodeGUID: 87f682bf-7703-45bb-ab3d-65a3e2fe4bd6
+      inputFieldName: executed
+      outputFieldName: executes
+      inputPortIdentifier: 
+      outputPortIdentifier: 
     groups: []
     stackNodes: []
     exposedParameters:
     - rid: 5309892628602159172
     stickyNotes: []
     nodeInspectorReference: {fileID: 0}
-    position: {x: 280, y: -164, z: 0}
-    scale: {x: 1, y: 1, z: 1}
+    position: {x: 390, y: -590, z: 0}
+    scale: {x: 1.520875, y: 1.520875, z: 1}
     startNodes:
     - rid: 5309892629070610674
     - rid: 5309892629070610675
+    - rid: 5309892695148987184
+    - rid: 5309892695148987185
+    - rid: 5309892695148987186
   references:
     version: 2
     RefIds:
@@ -48,23 +81,6 @@ MonoBehaviour:
         isHidden: 0
         expanded: 0
         guid: 339eab1b-78a3-47e8-967e-b9c7cb924ce5
-    - rid: 5309892629070610493
-      type: {class: SwitchNode, ns: , asm: Assembly-CSharp}
-      data:
-        GUID: e7d2c8b6-1580-4570-977a-d42fac1f48ee
-        nodeCustomName: 
-        position:
-          serializedVersion: 2
-          x: 323
-          y: 67
-          width: 100
-          height: 100
-        expanded: 0
-        debug: 0
-        nodeLock: 0
-        input: 0
-        enumType:
-          AQN: 
     - rid: 5309892629070610674
       type: {class: BTStartNode, ns: BBBirder.Graphs, asm: Assembly-CSharp}
       data:
@@ -72,8 +88,8 @@ MonoBehaviour:
         nodeCustomName: 
         position:
           serializedVersion: 2
-          x: -12
-          y: 436
+          x: 15.999998
+          y: 482.54065
           width: 70
           height: 48
         expanded: 0
@@ -86,10 +102,52 @@ MonoBehaviour:
         nodeCustomName: 
         position:
           serializedVersion: 2
-          x: -52.470173
-          y: 585.91705
-          width: 100
-          height: 100
+          x: 6.16848
+          y: 557.4193
+          width: 90
+          height: 48
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+    - rid: 5309892695148987184
+      type: {class: SelectorNode, ns: BBBirder.Graphs, asm: Assembly-CSharp}
+      data:
+        GUID: c14028bd-f917-4292-8972-3f66e884e2e2
+        nodeCustomName: 
+        position:
+          serializedVersion: 2
+          x: -99.42472
+          y: 674.3049
+          width: 90
+          height: 54
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+    - rid: 5309892695148987185
+      type: {class: SelectorNode, ns: BBBirder.Graphs, asm: Assembly-CSharp}
+      data:
+        GUID: f7a4933b-e6f8-4da8-8c5c-e6323304d9c8
+        nodeCustomName: 
+        position:
+          serializedVersion: 2
+          x: 16.000011
+          y: 674.00006
+          width: 90
+          height: 54
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+    - rid: 5309892695148987186
+      type: {class: SelectorNode, ns: BBBirder.Graphs, asm: Assembly-CSharp}
+      data:
+        GUID: 8938e3fe-a45e-44be-9f78-0430ad20412c
+        nodeCustomName: 
+        position:
+          serializedVersion: 2
+          x: 135.13441
+          y: 678.71313
+          width: 90
+          height: 54
         expanded: 0
         debug: 0
         nodeLock: 0

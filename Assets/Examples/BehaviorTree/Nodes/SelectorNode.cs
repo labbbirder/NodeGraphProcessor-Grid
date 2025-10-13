@@ -8,13 +8,16 @@ namespace BBBirder.Graphs
         const string DisplayName = "Selector";
         public override string name => DisplayName;
 
-        [Input(name: "Executed"), Vertical]
+        [Input, Vertical]
         public ExecutionLink executed;
 
-        // public override bool MoveNext()
+        [Output, Vertical]
+        public ExecutionLink executes;
+
+        // public override NodeStatus MoveNext()
         // {
         //     EnqueueExecutionPort(nameof(executes));
-        //     return false;
+        //     return NodeStatus.Success;
         // }
     }
 }

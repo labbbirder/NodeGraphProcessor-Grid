@@ -87,7 +87,7 @@ namespace GraphProcessor
                         continue;
 
                     //check if field is a collection type
-                    unpack = (inputAttribute != null) ? inputAttribute.Unpack : outputAttribute.Unpack;
+                    unpack = (inputAttribute != null) ? inputAttribute.Unpack : false;
                     isHide = (inputAttribute != null) ? inputAttribute.Hide : outputAttribute.hide;
                     input = inputAttribute != null;
                     tooltip = tooltipAttribute?.tooltip;

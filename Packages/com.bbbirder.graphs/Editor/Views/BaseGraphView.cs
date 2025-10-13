@@ -371,7 +371,7 @@ namespace GraphProcessor
 										Disconnect(edge);
 
 							nodeInspector.NodeViewRemoved(nodeView);
-							ExceptionToLog.Call(() => nodeView.OnRemoved());
+							ExceptionToLog.Call(() => nodeView.OnRemovedInternal());
 							graph.RemoveNode(nodeView.nodeTarget);
 							UpdateSerializedProperties();
 							RemoveElement(nodeView);
@@ -941,7 +941,7 @@ namespace GraphProcessor
 			var view = AddNodeView(node);
 
 			// Call create after the node have been initialized
-			ExceptionToLog.Call(() => view.OnCreated());
+			ExceptionToLog.Call(() => view.OnCreatedInternal());
 
 			return view;
 		}
@@ -1163,6 +1163,7 @@ namespace GraphProcessor
 
 			e.isConnected = true;
 
+			OnAddEdgeView(e);
 			return true;
 		}
 
@@ -1232,6 +1233,38 @@ namespace GraphProcessor
 			}
 
 			edgeViews.Remove(e);
+			OnRemoveEdgeView(e);
+		}
+
+		IVisualElementScheduledItem scheduledItem;
+		internal void DelayToResortEdges(string reason)
+		{
+			if (scheduledItem != null)
+			{
+				scheduledItem.Pause();
+			}
+
+			scheduledItem = schedule.Execute(() =>
+			{
+				// Debug.Log("resort reason " + reason);
+				graph.SortEdges();
+				foreach (var ev in edgeViews)
+				{
+					ev.UpdateLabels();
+				}
+			});
+
+			scheduledItem.ExecuteLater(10);
+		}
+
+		private void OnRemoveEdgeView(EdgeView e)
+		{
+			DelayToResortEdges("OnRemoveEdgeView");
+		}
+
+		private void OnAddEdgeView(EdgeView e)
+		{
+			DelayToResortEdges("OnAddEdgeView");
 		}
 
 		public void Disconnect(EdgeView e, bool refreshPorts = true)

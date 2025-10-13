@@ -157,7 +157,7 @@ namespace GraphProcessor
 		List<string> messages = new();
 
 		[NonSerialized]
-		protected BaseGraph graph;
+		protected internal BaseGraph graph;
 
 		internal bool HasCustomEnter => information.hasCustomEnter;
 		internal bool HasCustomMoveNext => information.hasCustomMoveNext;
@@ -400,7 +400,7 @@ namespace GraphProcessor
 		/// Called when the node is being executing
 		/// </summary>
 		/// <returns></returns>
-		public virtual bool MoveNext() { return true; }
+		public virtual bool MoveNext() { return false; }
 
 		#endregion
 

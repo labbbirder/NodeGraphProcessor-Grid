@@ -20,23 +20,29 @@ namespace GraphProcessor
 		{
 			styleSheets.Add(ResUtils.Load<StyleSheet>(edgeStylePath));
 			RegisterCallback<MouseDownEvent>(OnMouseDown);
-			this.Add(lblEnd = new Label("hi"));
-			this.Add(lblStart = new Label("hi"));
+			this.Add(lblEnd = new Label(""));
+			this.Add(lblStart = new Label(""));
 			SetLabelState(false, false);
 			SetLabelState(true, false);
 		}
 
-		internal void UpdateIndex(bool start, int i)
+		internal void UpdateLabels()
 		{
-			if (i == -1)
+			var edges = serializedEdge.inputPort.GetEdges();
+			SetLabelState(true, edges.Count > 1);
+			if (edges.Count > 1)
 			{
-				SetLabelState(start, false);
-				; (start ? lblStart : lblEnd).text = "";
+				var i = edges.IndexOf(serializedEdge) + 1;
+				lblStart.text = i.ToString();
 			}
-			else
+
+
+			edges = serializedEdge.outputPort.GetEdges();
+			SetLabelState(false, edges.Count > 1);
+			if (edges.Count > 1)
 			{
-				SetLabelState(start, true);
-				; (start ? lblStart : lblEnd).text = i.ToString();
+				var i = edges.IndexOf(serializedEdge) + 1;
+				lblEnd.text = i.ToString();
 			}
 		}
 
@@ -46,20 +52,15 @@ namespace GraphProcessor
 				displayState ? DisplayStyle.Flex : DisplayStyle.None;
 		}
 
-		internal void UpdateEdgeControlBase()
-		{
-			base.UpdateEdgeControl();
-		}
-
 		public override bool UpdateEdgeControl()
 		{
 			var result = base.UpdateEdgeControl();
-			lblStart.style.left = edgeControl.from.x + 16;
-			lblStart.style.top = edgeControl.from.y;
-			lblEnd.style.left = edgeControl.to.x - 16 - lblEnd.localBound.width;
-			lblEnd.style.top = edgeControl.to.y;
-			; (input as PortView)?.UpdatePortSort();
-			; (output as PortView)?.UpdatePortSort();
+			var vstart = (output as PortView)?.portData.vertical ?? false;
+			var vend = (input as PortView)?.portData.vertical ?? false;
+			lblStart.style.left = vstart ? edgeControl.from.x : edgeControl.from.x + 16;
+			lblStart.style.top = vstart ? edgeControl.from.y : edgeControl.from.y;
+			lblEnd.style.left = vend ? edgeControl.to.x : edgeControl.to.x - 16 - lblEnd.localBound.width;
+			lblEnd.style.top = vend ? edgeControl.to.y - 16 : edgeControl.to.y;
 			return result;
 		}
 
