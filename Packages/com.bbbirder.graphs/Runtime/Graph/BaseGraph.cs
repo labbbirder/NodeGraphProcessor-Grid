@@ -26,7 +26,7 @@ namespace GraphProcessor
     }
 
     [System.Serializable]
-    public class BaseGraph : ISerializationCallbackReceiver
+    public abstract class BaseGraph : ISerializationCallbackReceiver
     {
         /// <summary>
         /// The unity object that contains this graph. It can be a Component or ScriptableObject.
@@ -358,21 +358,48 @@ namespace GraphProcessor
         #endregion // end of Initialization
 
         #region Execution
+        public bool AutoStep { get; private set; }
+        public virtual bool IsRunning { get; }
+
         internal event Action onExecutionStateChanged;
 
-        protected void NotifyExecutionStateChanged()
+        protected internal void NotifyExecutionStateChanged()
         {
             onExecutionStateChanged?.Invoke();
         }
 
         public virtual void Run()
         {
+            AutoStep = true;
+            if (IsRunning) return;
+
+            MoveNext();
+            FrameStep();
         }
 
-        public virtual bool MoveNext()
+        public void FrameStep()
         {
-            return false;
+            const int MAX_ITERATION_COUNT = 200;
+            var iter = 0;
+            while (IsRunning && MoveNext() != NodeStatus.Running)
+            {
+                if (iter++ > MAX_ITERATION_COUNT)
+                {
+                    Debug.LogError($"execution iteration exceeds limits {MAX_ITERATION_COUNT}.");
+                    Stop();
+                    break;
+                }
+            }
+
+            if (!IsRunning)
+            {
+                AutoStep = false;
+            }
+
+            NotifyExecutionStateChanged();
         }
+
+        public abstract NodeStatus MoveNext();
 
         public virtual void Stop()
         {

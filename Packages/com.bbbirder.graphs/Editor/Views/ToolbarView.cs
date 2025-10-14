@@ -9,10 +9,22 @@ namespace GraphProcessor
     public class ToolbarView : OverlayView, ICreateVerticalToolbar, ICreateHorizontalToolbar
     {
         protected const string Id = "GraphProcessor-Toolbar";
-
+        bool autoFrameStep = false;
+        EditorToolbarButton btnRun, btnStep, btnStop;
         public OverlayToolbar CreateHorizontalToolbarContent()
         {
             return CreateToolbar();
+        }
+
+        protected internal override void Update()
+        {
+            if (Graph != null)
+            {
+                btnRun.SetEnabled(!Graph.IsRunning);
+                btnStop.SetEnabled(Graph.IsRunning);
+                if (Graph.AutoStep)
+                    Graph.FrameStep();
+            }
         }
 
         public override OverlayToolbar CreateVerticalToolbarContent()
@@ -70,7 +82,7 @@ namespace GraphProcessor
 
             root.Add(new ToolbarSpacer());
 
-            var btnRun = new EditorToolbarButton(ResUtils.Load<Texture2D>("../res/Icons/mdi--play.png"), () =>
+            btnRun = new EditorToolbarButton(ResUtils.Load<Texture2D>("../res/Icons/mdi--play.png"), () =>
             {
                 // Topology may be changed
                 Window.Graph.ClearDataFlowDirectionsCache();
@@ -83,16 +95,17 @@ namespace GraphProcessor
             };
             root.Add(btnRun);
 
-            var btnStep = new EditorToolbarButton(ResUtils.Load<Texture2D>("../res/Icons/codicon--debug-step-over.png"), () =>
+            btnStep = new EditorToolbarButton(ResUtils.Load<Texture2D>("../res/Icons/codicon--debug-step-over.png"), () =>
             {
                 Window.Graph.MoveNext();
+                Window.Graph.NotifyExecutionStateChanged();
             })
             {
                 tooltip = "Step",
             };
             root.Add(btnStep);
 
-            var btnStop = new EditorToolbarButton(ResUtils.Load<Texture2D>("../res/Icons/material-symbols--stop.png"), () =>
+            btnStop = new EditorToolbarButton(ResUtils.Load<Texture2D>("../res/Icons/material-symbols--stop.png"), () =>
             {
                 Window.Graph.Stop();
             })

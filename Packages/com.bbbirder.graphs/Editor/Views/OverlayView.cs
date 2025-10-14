@@ -15,7 +15,8 @@ namespace GraphProcessor
         protected OverlayElement pinnedElement;
         protected VisualElement root;
 
-        internal protected BaseGraphWindow Window => this.containerWindow as BaseGraphWindow;
+        public BaseGraphWindow Window => this.containerWindow as BaseGraphWindow;
+        public BaseGraph Graph => Window?.Graph;
 
         public override void OnCreated()
         {
@@ -30,6 +31,10 @@ namespace GraphProcessor
         protected virtual VisualElement CreateRootView()
         {
             return new();
+        }
+
+        internal protected virtual void Update()
+        {
         }
 
         public override sealed VisualElement CreatePanelContent()

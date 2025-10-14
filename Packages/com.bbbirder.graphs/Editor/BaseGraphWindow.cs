@@ -53,6 +53,11 @@ namespace GraphProcessor
 
 		protected virtual void Update()
 		{
+			foreach (var (id, overlay) in overlayViews)
+			{
+				overlay.Update();
+			}
+
 			// Workaround for the Refresh option of the editor window:
 			// When Refresh is clicked, OnEnable is called before the serialized data in the
 			// editor window is deserialized, causing the graph view to not be loaded

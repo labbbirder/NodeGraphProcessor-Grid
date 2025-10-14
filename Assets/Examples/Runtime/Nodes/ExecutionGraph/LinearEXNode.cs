@@ -27,15 +27,5 @@ namespace BBBirder.Graphs
 			EnqueueExecutionPort(nameof(executes));
 			return false;
 		}
-		// public override IEnumerable<ConditionalNode> CoroutineProcess()
-		// {
-		// 	var outputs = outputPorts.FirstOrDefault(n => n.fieldName == nameof(executes))
-		// 		.GetEdges().Select(e => e.inputNode as ConditionalNode);
-		// 	foreach (var n in outputs)
-		// 	{
-		// 		n.CoroutineProcess();
-		// 		yield return n;
-		// 	}
-		// }
 	}
 }

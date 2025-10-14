@@ -37,13 +37,14 @@ namespace BBBirder.Graphs
             if (index++ >= end)
             {
                 EnqueueExecutionPort(nameof(loopCompleted));
-                return false;
             }
             else
             {
+                EnqueueExecutionNode(this);
                 EnqueueExecutionPort(nameof(loopBody));
-                return true;
             }
+
+            return false;
         }
     }
 }

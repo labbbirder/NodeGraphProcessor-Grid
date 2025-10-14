@@ -4,45 +4,91 @@ using System.Collections.Generic;
 using System.Linq;
 using GraphProcessor;
 using UnityEngine;
-using static GraphProcessor.RuntimeTypeCache;
 
 namespace BBBirder.Graphs
 {
-    static class ExecutionGraphTypeCache
-    {
-        public class NodeInfo
-        {
-            public bool hasCustomEnter;
-            public bool hasCustomMoveNext;
-        }
-
-        public static NodeInfo GetNodeInfo(Type nodeType)
-        {
-            if (!s_exNodeInfos.TryGetValue(nodeType, out var info))
-            {
-                s_exNodeInfos[nodeType] = info = new()
-                {
-                    hasCustomEnter = IsMethodOverrided(nodeType, nameof(EXNode.Enter), typeof(BaseNode)),
-                    hasCustomMoveNext = IsMethodOverrided(nodeType, nameof(EXNode.MoveNext), typeof(BaseNode)),
-                };
-            }
-
-            return info;
-        }
-
-        private static Dictionary<Type, NodeInfo> s_exNodeInfos = new();
-    }
-
     [Serializable]
     public class ExecutionGraph : BaseGraph
     {
+        private EXNode topExecutingNode;
         private Stack<EXNode> executingNodes = new();
         private HashSet<EXNode> hashExecutingNodes = new();
         private Queue<EXNode> pushingNodes = new();
 
+        public override bool IsRunning => executingNodes.Count != 0;
+
+        protected override NodeStatus GetNodeStatus(BaseNode node) => hashExecutingNodes.Contains(node) ? NodeStatus.Running : NodeStatus.Normal;
+
+        public override NodeStatus MoveNext()
+        {
+            if (executingNodes.Count == 0)
+            {
+                var entryNode = EntryNode as EXNode;
+                executingNodes.Push(entryNode);
+                hashExecutingNodes.Add(entryNode);
+                entryNode.Enter();
+                return NodeStatus.Success;
+            }
+
+            TryPopExecutingNode(out var n);
+
+            NodeStatus status = NodeStatus.Normal;
+            if (n.HasCustomMoveNext)
+            {
+                PullDataRecursively(n);
+                try
+                {
+                    topExecutingNode = n;
+                    var isRunning = n.MoveNext();
+                    status = isRunning ? NodeStatus.Running : NodeStatus.Success;
+                    if (isRunning)
+                    {
+                        PushExecutingNode(n);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Debug.LogException(e);
+                    n.AddMessage(e.Message, NodeMessageType.Error);
+                    status = NodeStatus.Fault;
+                }
+                finally
+                {
+                    topExecutingNode = null;
+                }
+
+                DrainPushingNodes();
+            }
+
+            return status;
+        }
+
+        public override void Stop()
+        {
+            topExecutingNode = null;
+            pushingNodes.Clear();
+            executingNodes.Clear();
+            hashExecutingNodes.Clear();
+            foreach (var n in nodes)
+            {
+                n.ClearMessages();
+            }
+
+            NotifyExecutionStateChanged();
+        }
+
         internal void PushExecutingNode(EXNode node)
         {
-            pushingNodes.Enqueue(node);
+            // top executing node push self should not call Enter() again.
+            if (node != null && topExecutingNode == node)
+            {
+                executingNodes.Push(node);
+                hashExecutingNodes.Add(node);
+            }
+            else
+            {
+                pushingNodes.Enqueue(node);
+            }
         }
 
         internal void PushExecutingPort(NodePort outputPort)
@@ -128,71 +174,6 @@ namespace BBBirder.Graphs
                     port.portData.acceptMultipleEdges = true;
                 }
             }
-        }
-
-        protected override NodeStatus GetNodeStatus(BaseNode node) => hashExecutingNodes.Contains(node) ? NodeStatus.Running : NodeStatus.Normal;
-
-        public override void Run()
-        {
-            const int MAX_ITERATION_COUNT = 200;
-            var iter = 0;
-            while (MoveNext())
-            {
-                if (iter++ > MAX_ITERATION_COUNT)
-                {
-                    Debug.LogError($"execution iteration exceeds limits {MAX_ITERATION_COUNT}.");
-                    break;
-                }
-            }
-        }
-
-        public override bool MoveNext()
-        {
-            if (executingNodes.Count == 0)
-            {
-                var entryNode = EntryNode as EXNode;
-                executingNodes.Push(entryNode);
-                hashExecutingNodes.Add(entryNode);
-                entryNode.Enter();
-                NotifyExecutionStateChanged();
-                return true;
-            }
-
-            var n = executingNodes.Peek();
-
-            if (n.HasCustomMoveNext)
-            {
-                PullDataRecursively(n);
-                try
-                {
-                    var reenter = n.MoveNext();
-                    if (!reenter)
-                    {
-                        TryPopExecutingNode(out _);
-                    }
-                }
-                catch (Exception e)
-                {
-                    Debug.LogException(e);
-                }
-
-                DrainPushingNodes();
-            }
-            else
-            {
-                TryPopExecutingNode(out _);
-            }
-
-            NotifyExecutionStateChanged();
-            return executingNodes.Count != 0;
-        }
-
-        public override void Stop()
-        {
-            pushingNodes.Clear();
-            executingNodes.Clear();
-            hashExecutingNodes.Clear();
-            NotifyExecutionStateChanged();
         }
 
     }

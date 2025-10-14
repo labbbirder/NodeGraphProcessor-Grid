@@ -40,6 +40,11 @@ namespace BBBirder.Graphs
             }
         }
 
+        public virtual void EnqueueExecutionNode(EXNode node)
+        {
+            Graph.PushExecutingNode(node);
+        }
+
         public virtual void EnqueueExecutionPort(NodePort outputPort)
         {
             Graph.PushExecutingPort(outputPort);

@@ -32,8 +32,8 @@ namespace GraphProcessor
 
         public string guid; // unique id to keep track of the parameter
         public string name;
-        [Obsolete("Use GetValueType()")]
-        public string type;
+        // [Obsolete("Use GetValueType()")]
+        // public string type;
         public bool input = true;
         [SerializeReference]
         public Settings settings;
@@ -53,37 +53,37 @@ namespace GraphProcessor
         public virtual object value { get; set; }
         public virtual Type GetValueType() => value == null ? typeof(object) : value.GetType();
 
-        static Dictionary<Type, Type> exposedParameterTypeCache = new Dictionary<Type, Type>();
-        internal ExposedParameter Migrate()
-        {
-            if (exposedParameterTypeCache.Count == 0)
-            {
-                foreach (var type in AppDomain.CurrentDomain.GetAllTypes())
-                {
-                    if (type.IsSubclassOf(typeof(ExposedParameter)) && !type.IsAbstract)
-                    {
-                        var paramType = Activator.CreateInstance(type) as ExposedParameter;
-                        exposedParameterTypeCache[paramType.GetValueType()] = type;
-                    }
-                }
-            }
-#pragma warning disable CS0618 // Use of obsolete fields
-            var oldType = Type.GetType(type);
-#pragma warning restore CS0618
-            if (oldType == null || !exposedParameterTypeCache.TryGetValue(oldType, out var newParamType))
-                return null;
+        // static Dictionary<Type, Type> exposedParameterTypeCache = new Dictionary<Type, Type>();
+        //         internal ExposedParameter Migrate()
+        //         {
+        //             if (exposedParameterTypeCache.Count == 0)
+        //             {
+        //                 foreach (var type in AppDomain.CurrentDomain.GetAllTypes())
+        //                 {
+        //                     if (type.IsSubclassOf(typeof(ExposedParameter)) && !type.IsAbstract)
+        //                     {
+        //                         var paramType = Activator.CreateInstance(type) as ExposedParameter;
+        //                         exposedParameterTypeCache[paramType.GetValueType()] = type;
+        //                     }
+        //                 }
+        //             }
+        // #pragma warning disable CS0618 // Use of obsolete fields
+        //             var oldType = Type.GetType(type);
+        // #pragma warning restore CS0618
+        //             if (oldType == null || !exposedParameterTypeCache.TryGetValue(oldType, out var newParamType))
+        //                 return null;
 
-            var newParam = Activator.CreateInstance(newParamType) as ExposedParameter;
+        //             var newParam = Activator.CreateInstance(newParamType) as ExposedParameter;
 
-            newParam.guid = guid;
-            newParam.name = name;
-            newParam.input = input;
-            newParam.settings = newParam.CreateSettings();
-            newParam.settings.guid = guid;
+        //             newParam.guid = guid;
+        //             newParam.name = name;
+        //             newParam.input = input;
+        //             newParam.settings = newParam.CreateSettings();
+        //             newParam.settings.guid = guid;
 
-            return newParam;
+        //             return newParam;
 
-        }
+        //         }
 
         public static bool operator ==(ExposedParameter param1, ExposedParameter param2)
         {
