@@ -1,6 +1,6 @@
 # Edge的全排序
 
-![img](./starTopo.png)
+![img](./StarTopo.png)
 
 Node之间通过Edge建立联系。因为Node分为InputPort和OutputPort，因此Edge是有向的。
 
