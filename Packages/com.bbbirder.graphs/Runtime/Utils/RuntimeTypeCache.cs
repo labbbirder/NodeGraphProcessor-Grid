@@ -39,7 +39,7 @@ namespace GraphProcessor
                     {
                         if (e.FieldType == typeof(ExecutionLink))
                         {
-                            return i + fieldInfos.Length;
+                            return i - fieldInfos.Length;
                         }
                         else
                         {
@@ -106,20 +106,18 @@ namespace GraphProcessor
 
                 s_node2nodeInformation[nodeType] = information = new()
                 {
-                    hasCustomEnter = IsNodeMethodOverrided(nodeType, nameof(BaseNode.Enter)),
-                    hasCustomAfterPullDatas = IsNodeMethodOverrided(nodeType, nameof(BaseNode.AfterPullDatas)),
-                    hasCustomMoveNext = IsNodeMethodOverrided(nodeType, nameof(BaseNode.MoveNext)),
                     needsInspector = needsInspector,
                     ioFields = ioFields,
                 };
             }
 
             return information;
+        }
 
-            static bool IsNodeMethodOverrided(Type nodeType, string name)
-            {
-                return nodeType.GetMethod(name, InstanceFlags).DeclaringType != typeof(BaseNode);
-            }
+
+        public static bool IsMethodOverrided(Type nodeType, string name, Type baseType)
+        {
+            return nodeType.GetMethod(name, InstanceFlags).DeclaringType != baseType;
         }
 
         static Dictionary<Type, CollectionMetatype> s_collectionMetatypes = new();
@@ -190,9 +188,6 @@ namespace GraphProcessor
         internal class NodeInformation
         {
             public bool needsInspector;
-            public bool hasCustomEnter;
-            public bool hasCustomMoveNext;
-            public bool hasCustomAfterPullDatas;
             public Dictionary<string, NodeFieldInformation> ioFields;
         }
 

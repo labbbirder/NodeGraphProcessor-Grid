@@ -84,7 +84,7 @@ namespace GraphProcessor
 
             node.onMessageAdded += AddMessageView;
             node.onMessageRemoved += RemoveMessageView;
-            node.onPortsUpdated += UpdatePortsForField;
+            node.onPortsUpdated += OnPortsUpdated;
 
             styleSheets.Add(ResUtils.Load<StyleSheet>(BaseNodeStylePath));
 
@@ -1006,14 +1006,14 @@ namespace GraphProcessor
 
         public void OnRemovedInternal()
         {
-            nodeTarget.graph.MakeNodeSortDirty();
+            nodeTarget.graph.ClearNodeSortCache();
             GraphView.DelayToResortEdges("On Node Remove");
             OnRemoved();
         }
 
         public void OnCreatedInternal()
         {
-            nodeTarget.graph.MakeNodeSortDirty();
+            nodeTarget.graph.ClearNodeSortCache();
             GraphView.DelayToResortEdges("On Node Add");
             OnCreated();
         }
@@ -1031,7 +1031,7 @@ namespace GraphProcessor
                     GraphView.RegisterCompleteObjectUndo("Moved graph node");
 
                 nodeTarget.position = newPos;
-                nodeTarget.graph.MakeNodeSortDirty();
+                nodeTarget.graph.ClearNodeSortCache();
                 GraphView.DelayToResortEdges("On Node SetPosition");
 
                 initializing = false;
@@ -1156,9 +1156,8 @@ namespace GraphProcessor
             return base.RefreshPorts();
         }
 
-        void UpdatePortsForField(string fieldName)
+        void OnPortsUpdated()
         {
-            // TODO: actual code
             RefreshPorts();
         }
 

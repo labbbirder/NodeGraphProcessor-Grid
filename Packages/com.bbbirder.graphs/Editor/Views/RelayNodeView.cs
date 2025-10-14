@@ -19,7 +19,7 @@ public class RelayNodeView : BaseNodeView
 		this.Q("title").RemoveFromHierarchy();
 		this.Q("divider").RemoveFromHierarchy();
 
-		relay.onPortsUpdated += _ => UpdateSize();
+		// relay.onPortsUpdated += _ => UpdateSize();
 	}
 
 	// public override void BuildContextualMenu(ContextualMenuPopulateEvent evt)

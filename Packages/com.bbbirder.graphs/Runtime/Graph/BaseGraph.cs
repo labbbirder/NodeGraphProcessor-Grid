@@ -41,6 +41,8 @@ namespace GraphProcessor
         [SerializeReference]
         public List<BaseNode> nodes = new();
 
+        [SerializeReference] protected List<BaseNode> entryNodes = new();
+
         /// <summary>
         /// Dictionary to access node per GUID, faster than a search in a list
         /// </summary>
@@ -104,7 +106,7 @@ namespace GraphProcessor
         internal UnityEngine.Object nodeInspectorReference;
 
         [SerializeField]
-        protected virtual BaseNode EntryNode => null;
+        protected BaseNode EntryNode => entryNodes.FirstOrDefault();
 
         //graph visual properties
         public Vector3 position = Vector3.zero;
@@ -136,6 +138,14 @@ namespace GraphProcessor
 
         [System.NonSerialized]
         bool _isInitialized = false;
+
+
+        Dictionary<BaseNode, (int hi, int vi)> nodeIndices = new();
+        Dictionary<BaseNode, HashSet<BaseNode>> dataFlowDirections = new();
+        Dictionary<BaseNode, HashSet<BaseNode>> dataFlowReversedDirections = new();
+        Dictionary<BaseNode, bool> dataFlowDeterministics = new();
+        Dictionary<BaseNode, List<BaseNode>> dataflowDependenciesMatrix = new();
+
         public bool IsInitialized => _isInitialized;
 
         public UnityEngine.Object GetContainingObject() => unityObject;
@@ -160,15 +170,15 @@ namespace GraphProcessor
             onEnabled?.Invoke();
         }
 
-        Dictionary<BaseNode, (int hi, int vi)> nodeIndices = new();
-
-        internal void MakeNodeSortDirty()
+        internal void ClearNodeSortCache()
         {
             nodeIndices.Clear();
         }
 
         private void EnsureNodeSorted()
         {
+            nodes.RemoveAll(n => n is null);
+
             if (nodes.Count > 0 && nodeIndices.Count == 0)
             {
                 using var _ = CollectionPool.Get<List<BaseNode>>(out var tempNodes);
@@ -200,6 +210,16 @@ namespace GraphProcessor
         {
             EnsureNodeSorted();
 
+            edges.RemoveAll(e => e.inputNode == null
+                || e.outputNode == null
+                || string.IsNullOrEmpty(e.outputFieldName)
+                || string.IsNullOrEmpty(e.inputFieldName)
+            );
+
+            foreach (var edge in edges)
+            {
+                edge.OnBeforeSerialize();
+            }
 
             edges.Sort((l, r) =>
             {
@@ -294,7 +314,7 @@ namespace GraphProcessor
 
             _isInitialized = false;
             foreach (var node in nodes)
-                node.DisableInternal();
+                node?.DisableInternal();
         }
 
         void InitializeGraphElements()
@@ -310,6 +330,7 @@ namespace GraphProcessor
                 node.Initialize(this);
             }
 
+            using var _ = CollectionPool.Get<List<SerializableEdge>>(out var brokenEdges);
 
             foreach (var edge in edges)
             {
@@ -319,8 +340,7 @@ namespace GraphProcessor
                 // Sanity check for the edge:
                 if (edge.inputPort == null || edge.outputPort == null)
                 {
-#warning Collection may modified
-                    Disconnect(edge.GUID);
+                    brokenEdges.Add(edge);
                     continue;
                 }
 
@@ -328,146 +348,37 @@ namespace GraphProcessor
                 edge.inputPort.owner.OnEdgeConnected(edge);
                 edge.outputPort.owner.OnEdgeConnected(edge);
             }
+
+            foreach (var edge in brokenEdges)
+            {
+                Disconnect(edge.GUID);
+            }
         }
 
         #endregion // end of Initialization
 
         #region Execution
-        private Stack<BaseNode> executingNodes = new();
-        private HashSet<BaseNode> hashExecutingNodes = new();
-        private Queue<BaseNode> pushingNodes = new();
         internal event Action onExecutionStateChanged;
 
-        internal void PushExecutingNode(BaseNode node)
+        protected void NotifyExecutionStateChanged()
         {
-            pushingNodes.Enqueue(node);
-        }
-
-        internal protected void PushExecutingPort(NodePort outputPort)
-        {
-            var edges = outputPort.GetEdges();
-#if DEBUG
-            if (outputPort.fieldInfo != null && outputPort.fieldInfo.FieldType != typeof(ExecutionLink))
-            {
-                throw new($"field {outputPort.fieldName} must be ExecutionLink");
-            }
-#endif
-            if (edges.Count > 0)
-            {
-                PushExecutingNode(edges[0].inputNode);
-            }
-        }
-
-        private void DrainPushingNodes()
-        {
-            while (pushingNodes.TryDequeue(out var node))
-            {
-                if (hashExecutingNodes.Contains(node))
-                {
-                    while (executingNodes.TryPeek(out var top) && top != node)
-                    {
-                        executingNodes.Pop();
-                    }
-                }
-                else
-                {
-                    executingNodes.Push(node);
-                    hashExecutingNodes.Add(node);
-                    try
-                    {
-                        if (node.HasCustomEnter)
-                        {
-                            PullDataRecursively(node);
-                            node.Enter();
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        Debug.LogException(e);
-                    }
-                }
-            }
-        }
-
-        public bool TryPopExecutingNode(out BaseNode node)
-        {
-            if (executingNodes.Count > 0)
-            {
-                node = executingNodes.Pop();
-                hashExecutingNodes.Remove(node);
-                return true;
-            }
-            else
-            {
-                node = null;
-                return false;
-            }
+            onExecutionStateChanged?.Invoke();
         }
 
         public virtual void Run()
         {
-            const int MAX_ITERATION_COUNT = 200;
-            var iter = 0;
-            while (MoveNext())
-            {
-                if (iter++ > MAX_ITERATION_COUNT)
-                {
-                    Debug.LogError($"execution iteration exceeds limits {MAX_ITERATION_COUNT}.");
-                    break;
-                }
-            }
         }
 
         public virtual bool MoveNext()
         {
-            if (executingNodes.Count == 0)
-            {
-                var entryNode = EntryNode;
-                executingNodes.Push(entryNode);
-                hashExecutingNodes.Add(entryNode);
-                entryNode.Enter();
-                onExecutionStateChanged?.Invoke();
-                return true;
-            }
-
-            var n = executingNodes.Peek();
-
-            if (n.HasCustomMoveNext)
-            {
-                PullDataRecursively(n);
-                try
-                {
-                    var reenter = n.MoveNext();
-                    if (!reenter)
-                    {
-                        TryPopExecutingNode(out _);
-                    }
-                }
-                catch (Exception e)
-                {
-                    Debug.LogException(e);
-                }
-
-                DrainPushingNodes();
-            }
-            else
-            {
-                TryPopExecutingNode(out _);
-            }
-
-            onExecutionStateChanged?.Invoke();
-            return executingNodes.Count != 0;
+            return false;
         }
 
         public virtual void Stop()
         {
-            pushingNodes.Clear();
-            executingNodes.Clear();
-            hashExecutingNodes.Clear();
-            onExecutionStateChanged?.Invoke();
         }
 
-        internal NodeStatus GetNodeStatus(BaseNode node) => hashExecutingNodes.Contains(node) ? NodeStatus.Running : NodeStatus.Normal;
+        internal protected virtual NodeStatus GetNodeStatus(BaseNode node) => NodeStatus.Normal;
 
         #endregion // end of Execution
 
@@ -507,62 +418,40 @@ namespace GraphProcessor
             return true;
         }
 
-        Dictionary<BaseNode, HashSet<BaseNode>> dataFlowDirections = new();
-        Dictionary<BaseNode, HashSet<BaseNode>> dataFlowReversedDirections = new();
-        Dictionary<BaseNode, bool> dataFlowDeterministics = new();
-        Dictionary<BaseNode, List<BaseNode>> dataflowDependenciesMatrix = new();
+        internal void ClearPortsTransferCache()
+        {
+            foreach (var node in nodes)
+            {
+                foreach (var port in node.inputPorts)
+                {
+                    port.ClearTransferCache();
+                }
+            }
+        }
 
-        public void ClearRuntimeCache()
+        internal void ClearDataFlowDirectionsCache()
         {
             dataFlowDirections.Clear();
             dataFlowReversedDirections.Clear();
             dataFlowDeterministics.Clear();
             dataflowDependenciesMatrix.Clear();
-
-            foreach (var node in nodes)
-            {
-                foreach (var port in node.inputPorts)
-                {
-                    port.ClearRuntimeCache();
-                }
-            }
         }
+
 
         public HashSet<BaseNode> GetDataFlowDirections(BaseNode node)
         {
-            string d = "";
             if (!dataFlowDirections.TryGetValue(node, out var directions))
             {
                 directions = new();
                 foreach (var p in node.outputPorts)
                 {
-                    d += $"{p} {p.fieldInfo} \n";
                     if (p.fieldInfo.FieldType == typeof(ExecutionLink))
                         continue;
 
-                    d += $"in {p} {p.GetEdges().Count} \n";
                     foreach (var e in p.GetEdges())
                     {
                         directions.Add(e.inputNode);
                     }
-                }
-
-                if (node.GetType().Name.Contains("Float") && directions.Count == 0)
-                {
-                    directions = new();
-
-                    foreach (var p in node.outputPorts)
-                    {
-                        if (p.fieldInfo.FieldType == typeof(ExecutionLink))
-                            continue;
-
-                        foreach (var e in p.GetEdges())
-                        {
-                            directions.Add(e.inputNode);
-                        }
-                    }
-
-                    throw null;
                 }
 
                 dataFlowDirections[node] = directions;
@@ -594,6 +483,7 @@ namespace GraphProcessor
             return directions;
         }
 
+
         bool IsFlowDeterministic(BaseNode targetNode)
         {
             if (!targetNode.IsDataFlowDeterministic) return false;
@@ -623,7 +513,7 @@ namespace GraphProcessor
             return deterministic;
         }
 
-        internal void PullDataRecursively(NodePort inputPort)
+        public void PullDataRecursively(NodePort inputPort)
         {
             foreach (var e in inputPort.GetEdges())
             {
@@ -634,7 +524,7 @@ namespace GraphProcessor
             inputPort.PullData();
         }
 
-        internal void PullDataRecursively(BaseNode targetNode)
+        public void PullDataRecursively(BaseNode targetNode)
         {
             bool first;
 
@@ -734,7 +624,17 @@ namespace GraphProcessor
         /// <summary>
         /// Do some graph elements correction jobs here.
         /// </summary>
-        internal protected virtual void BeforeSaveToDisk() { }
+        internal protected virtual void BeforeSaveToDisk()
+        {
+            entryNodes.Clear();
+            foreach (var n in nodes)
+            {
+                if (n is IEntryNode)
+                {
+                    entryNodes.Add(n);
+                }
+            }
+        }
 
         public virtual void OnAssetDeleted() { }
 
@@ -944,7 +844,18 @@ namespace GraphProcessor
             OnGraphChanges(changes);
         }
 
-        protected virtual void OnGraphChanges(GraphChanges changes) { }
+        protected virtual void OnGraphChanges(GraphChanges changes)
+        {
+            if (changes.addedNode is IEntryNode)
+            {
+                entryNodes.Add(changes.addedNode);
+            }
+
+            if (changes.removedNode is IEntryNode)
+            {
+                entryNodes.Remove(changes.removedNode);
+            }
+        }
 
         public void OnBeforeSerialize()
         {

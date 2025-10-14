@@ -12,7 +12,7 @@ namespace GraphProcessor
 
 			foreach (var obj in objects)
 			{
-				if (obj is IGraphOwner b && b.Graph is BaseGraph graph)
+				if (obj is IGraphOwner graphOwner && graphOwner.Graph is BaseGraph graph)
 				{
 					foreach (var graphWindow in Resources.FindObjectsOfTypeAll<BaseGraphWindow>())
 						graphWindow.OnGraphDeleted();

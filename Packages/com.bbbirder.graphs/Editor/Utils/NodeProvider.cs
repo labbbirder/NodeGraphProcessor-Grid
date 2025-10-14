@@ -38,7 +38,6 @@ namespace GraphProcessor
 		public struct NodeSpecificToGraph
 		{
 			public Type nodeType;
-			public List<MethodInfo> isCompatibleWithGraph;
 			public Type compatibleWithGraphType;
 		}
 
@@ -64,12 +63,6 @@ namespace GraphProcessor
 			foreach (var nodeInfo in specificNodes)
 			{
 				bool compatible = nodeInfo.compatibleWithGraphType == null || nodeInfo.compatibleWithGraphType == graphType;
-
-				if (nodeInfo.isCompatibleWithGraph != null)
-				{
-					foreach (var method in nodeInfo.isCompatibleWithGraph)
-						compatible &= (bool)method?.Invoke(null, new object[] { graph });
-				}
 
 				if (compatible)
 					BuildCacheForNode(nodeInfo.nodeType, descriptions, graph);
@@ -125,23 +118,11 @@ namespace GraphProcessor
 		// Check if node has anything that depends on the graph type or settings
 		static bool IsNodeSpecificToGraph(Type nodeType)
 		{
-			var isCompatibleWithGraphMethods = nodeType.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy).Where(m => m.GetCustomAttribute<IsCompatibleWithGraph>() != null);
-			var nodeMenuAttributes = nodeType.GetCustomAttributes<NodeMenuItemAttribute>();
+			var compatibleAttrs = nodeType.GetCustomAttributes<CompatibleWithGraphAttribute>(true);
 
-			List<Type> compatibleGraphTypes = nodeMenuAttributes.Where(n => n.onlyCompatibleWithGraph != null).Select(a => a.onlyCompatibleWithGraph).ToList();
+			List<Type> compatibleGraphTypes = compatibleAttrs.Where(n => n.GraphType != null).Select(a => a.GraphType).ToList();
 
-			List<MethodInfo> compatibleMethods = new List<MethodInfo>();
-			foreach (var method in isCompatibleWithGraphMethods)
-			{
-				// Check if the method is static and have the correct prototype
-				var p = method.GetParameters();
-				if (method.ReturnType != typeof(bool) || p.Count() != 1 || p[0].ParameterType != typeof(BaseGraph))
-					Debug.LogError($"The function '{method.Name}' marked with the IsCompatibleWithGraph attribute either doesn't return a boolean or doesn't take one parameter of BaseGraph type.");
-				else
-					compatibleMethods.Add(method);
-			}
-
-			if (compatibleMethods.Count > 0 || compatibleGraphTypes.Count > 0)
+			if (compatibleGraphTypes.Count > 0)
 			{
 				// We still need to add the element in specificNode even without specific graph
 				if (compatibleGraphTypes.Count == 0)
@@ -152,7 +133,6 @@ namespace GraphProcessor
 					specificNodes.Add(new NodeSpecificToGraph
 					{
 						nodeType = nodeType,
-						isCompatibleWithGraph = compatibleMethods,
 						compatibleWithGraphType = graphType
 					});
 				}

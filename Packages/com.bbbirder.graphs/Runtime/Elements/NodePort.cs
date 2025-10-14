@@ -131,7 +131,7 @@ namespace GraphProcessor
         //     if(lhs.ou)
         // }
 
-        public void ClearRuntimeCache()
+        public void ClearTransferCache()
         {
             soloTransfer = null;
             packTransfer = null;

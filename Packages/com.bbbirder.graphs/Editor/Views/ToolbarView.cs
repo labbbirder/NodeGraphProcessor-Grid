@@ -72,7 +72,10 @@ namespace GraphProcessor
 
             var btnRun = new EditorToolbarButton(ResUtils.Load<Texture2D>("../res/Icons/mdi--play.png"), () =>
             {
-                Window.Graph.ClearRuntimeCache();
+                // Topology may be changed
+                Window.Graph.ClearDataFlowDirectionsCache();
+                Window.Graph.ClearPortsTransferCache();
+
                 Window.Graph.Run();
             })
             {

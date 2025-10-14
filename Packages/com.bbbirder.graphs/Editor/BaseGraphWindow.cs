@@ -62,7 +62,7 @@ namespace GraphProcessor
 				reloadWorkaround = false;
 			}
 
-			if (graphOwner == null)
+			if (graphOwner == null && graphView != null)
 			{
 				rootView.Remove(graphView);
 				graphView = null;
@@ -184,10 +184,10 @@ namespace GraphProcessor
 
 		public virtual void OnGraphDeleted()
 		{
-			if (Graph != null && graphView != null)
-				rootView.Remove(graphView);
+			// if (Graph != null && graphView != null)
+			// 	rootView.Remove(graphView);
 
-			graphView = null;
+			// graphView = null;
 		}
 
 		// protected virtual void InitializeGraphView(BaseGraphView view) { }

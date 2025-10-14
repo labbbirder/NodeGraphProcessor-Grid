@@ -1,29 +1,21 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using GraphProcessor;
+﻿using GraphProcessor;
 using UnityEditor;
 using UnityEditor.Callbacks;
-using UnityEngine;
 
-public class GraphAssetCallbacks
+namespace BBBirder.Graphs
 {
-	// [MenuItem("Assets/Create/GraphProcessor", false, 10)]
-	// public static void CreateGraphPorcessor()
-	// {
-	// 	var graph = ScriptableObject.CreateInstance<BaseGraph>();
-	// 	ProjectWindowUtil.CreateAsset(graph, "GraphProcessor.asset");
-	// }
-
-	[OnOpenAsset(0)]
-	public static bool OnBaseGraphOpened(int instanceID, int line)
+	public class GraphAssetCallbacks
 	{
-		var graphOwner = EditorUtility.InstanceIDToObject(instanceID) as IGraphOwner;
-		if (graphOwner != null)
+		[OnOpenAsset(0)]
+		public static bool OnBaseGraphOpened(int instanceID, int line)
 		{
-			EditorWindow.GetWindow<BaseGraphWindow>().InitializeGraph(graphOwner as UnityEngine.Object);
-			return true;
+			var graphOwner = EditorUtility.InstanceIDToObject(instanceID) as IGraphOwner;
+			if (graphOwner != null)
+			{
+				EditorWindow.GetWindow<BaseGraphWindow>().InitializeGraph(graphOwner as UnityEngine.Object);
+				return true;
+			}
+			return false;
 		}
-		return false;
 	}
 }

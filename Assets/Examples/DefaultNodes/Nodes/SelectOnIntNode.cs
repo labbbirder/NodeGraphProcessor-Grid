@@ -6,7 +6,7 @@ using BBBirder;
 using GraphProcessor;
 using UnityEngine;
 
-[System.Serializable, NodeMenuItem("Conditional/Select On Int")]
+[System.Serializable, NodeMenuItem("Logic/Select On Int")]
 public partial class SelectOnIntNode : BaseNode
 {
 	[Input(name: "In")]

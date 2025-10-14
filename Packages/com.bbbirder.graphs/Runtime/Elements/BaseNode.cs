@@ -33,6 +33,9 @@ namespace GraphProcessor
 		//id
 		public string GUID;
 
+		/// <summary>
+		/// Can be regarded as `constant propagation`
+		/// </summary>
 		internal protected virtual bool IsDataFlowDeterministic => false;
 		// public event NodeStatusChangedDelegate onStatusChanged;
 
@@ -103,8 +106,6 @@ namespace GraphProcessor
 		/// </summary>
 		public bool nodeLock;
 
-		public delegate void ProcessDelegate();
-
 		/// <summary>
 		/// Triggered when the node is processes
 		/// </summary>
@@ -123,7 +124,7 @@ namespace GraphProcessor
 		/// <summary>
 		/// Triggered after a single/list of port(s) is updated, the parameter is the field name
 		/// </summary>
-		public event Action<string> onPortsUpdated;
+		public event Action onPortsUpdated;
 
 		[NonSerialized]
 		NodeInformation information;
@@ -150,18 +151,12 @@ namespace GraphProcessor
 
 		internal Dictionary<string, NodeFieldInformation> ioFields => information.ioFields;
 
-		// [NonSerialized]
-		// internal Dictionary<Type, CustomPortTypeBehaviorDelegate> customPortTypeBehaviorMap = new();
-
 		[NonSerialized]
 		List<string> messages = new();
 
 		[NonSerialized]
 		protected internal BaseGraph graph;
 
-		internal bool HasCustomEnter => information.hasCustomEnter;
-		internal bool HasCustomMoveNext => information.hasCustomMoveNext;
-		internal bool HasCustomAfterPullDatas => information.hasCustomAfterPullDatas;
 		internal protected virtual bool PullDataManually => false;
 
 
@@ -278,7 +273,7 @@ namespace GraphProcessor
 				}
 			}
 
-			onPortsUpdated?.Invoke("");
+			onPortsUpdated?.Invoke();
 		}
 
 		/// <summary>
@@ -391,38 +386,9 @@ namespace GraphProcessor
 		/// </summary>
 		protected virtual void Destroy() { }
 
-		/// <summary>
-		/// Called when the node is about to executed
-		/// </summary>
-		public virtual void Enter() { }
-
-		/// <summary>
-		/// Called when the node is being executing
-		/// </summary>
-		/// <returns></returns>
-		public virtual bool MoveNext() { return false; }
-
 		#endregion
 
 		#region API and utils
-
-		public void EnqueueExecutionPort(string portName)
-		{
-			if (!outputPorts.TryGetPorts(portName, out var ports))
-			{
-				throw new($"field {portName} not found in {this}");
-			}
-
-			if (ports.Count > 0)
-			{
-				graph.PushExecutingPort(ports[0]);
-			}
-		}
-
-		public virtual void EnqueueExecutionPort(NodePort outputPort)
-		{
-			graph.PushExecutingPort(outputPort);
-		}
 
 		/// <summary>
 		/// Add a port
@@ -451,11 +417,9 @@ namespace GraphProcessor
 		/// </summary>
 		/// <param name="input">is input port</param>
 		/// <param name="port">the port to delete</param>
-		public void RemovePort(bool input, NodePort port)
+		public void RemovePort(NodePort port)
 		{
-			if (input)
-				inputPorts.Remove(port);
-			else
+			if (!inputPorts.Remove(port))
 				outputPorts.Remove(port);
 		}
 
@@ -470,59 +434,6 @@ namespace GraphProcessor
 				inputPorts.RemoveAll(p => p.fieldName == fieldName);
 			else
 				outputPorts.RemoveAll(p => p.fieldName == fieldName);
-		}
-
-		/// <summary>
-		/// Get all the nodes connected to the input ports of this node
-		/// </summary>
-		/// <returns>an enumerable of node</returns>
-		public IEnumerable<BaseNode> GetInputNodes()
-		{
-			foreach (var port in inputPorts)
-				foreach (var edge in port.GetEdges())
-					yield return edge.outputNode;
-		}
-
-		/// <summary>
-		/// Get all the nodes connected to the output ports of this node
-		/// </summary>
-		/// <returns>an enumerable of node</returns>
-		public IEnumerable<BaseNode> GetOutputNodes()
-		{
-			foreach (var port in outputPorts)
-				foreach (var edge in port.GetEdges())
-					yield return edge.inputNode;
-		}
-
-		/// <summary>
-		/// Return a node matching the condition in the dependencies of the node
-		/// </summary>
-		/// <param name="condition">Condition to choose the node</param>
-		/// <returns>Matched node or null</returns>
-		public BaseNode FindInDependencies(Func<BaseNode, bool> condition)
-		{
-			Stack<BaseNode> dependencies = new Stack<BaseNode>();
-
-			dependencies.Push(this);
-
-			int depth = 0;
-			while (dependencies.Count > 0)
-			{
-				var node = dependencies.Pop();
-
-				// Guard for infinite loop (faster than a HashSet based solution)
-				depth++;
-				if (depth > 2000)
-					break;
-
-				if (condition(node))
-					return node;
-
-				foreach (var dep in node.GetInputNodes())
-					dependencies.Push(dep);
-			}
-
-			return null;
 		}
 
 		/// <summary>
@@ -565,21 +476,7 @@ namespace GraphProcessor
 		/// <returns></returns>
 		public IEnumerable<NodePort> GetAllPorts()
 		{
-			foreach (var port in inputPorts)
-				yield return port;
-			foreach (var port in outputPorts)
-				yield return port;
-		}
-
-		/// <summary>
-		/// Return all the connected edges of the node
-		/// </summary>
-		/// <returns></returns>
-		public IEnumerable<SerializableEdge> GetAllEdges()
-		{
-			foreach (var port in GetAllPorts())
-				foreach (var edge in port.GetEdges())
-					yield return edge;
+			return inputPorts.Concat(outputPorts);
 		}
 
 		/// <summary>
