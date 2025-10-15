@@ -1,5 +1,12 @@
 {
   "dependencies": {
+    "com.bbbirder.directattribute": {
+      "version": "2.0.15",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://package.openupm.com"
+    },
     "com.bbbirder.graphs": {
       "version": "file:com.bbbirder.graphs",
       "depth": 0,
@@ -9,11 +16,26 @@
         "org.nuget.system.runtime.compilerservices.unsafe": "6.1.2"
       }
     },
+    "com.bbbirder.instructions": {
+      "version": "file:com.bbbirder.instructions",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {
+        "com.cysharp.unitask": "2.5.5"
+      }
+    },
     "com.bbbirder.utils": {
       "version": "file:com.bbbirder.utils",
       "depth": 0,
       "source": "embedded",
       "dependencies": {}
+    },
+    "com.cysharp.unitask": {
+      "version": "2.5.10",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://package.openupm.com"
     },
     "com.unity.2d.sprite": {
       "version": "1.0.0",

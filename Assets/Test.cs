@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using BBBirder;
+using BBBirder.Instructions;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Profiling;
@@ -61,7 +62,11 @@ public class Test : MonoBehaviour
     public Bar bar22;
     [OnChange("Good")]
     public Bar eee;
+    [SerializeField]
+    Evaluation<float> valueGetter;
 
+    [SerializeField]
+    Procedure procedure;
     public void OnIntChanged(int v, int pv)
     {
         Debug.Log($"from {pv} to {v}");

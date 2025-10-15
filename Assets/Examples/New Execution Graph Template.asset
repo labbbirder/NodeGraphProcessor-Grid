@@ -22,7 +22,6 @@ MonoBehaviour:
     - rid: 5309892650442687027
     - rid: 5309892653960397177
     - rid: 5309892653960397178
-    - rid: 234564586037575955
     - rid: 234564586037576012
     - rid: 234564586037576013
     - rid: 5309892720164339950
@@ -32,6 +31,7 @@ MonoBehaviour:
     - rid: 5309892737699151872
     - rid: 5309892737699151873
     - rid: 5309892737699151874
+    - rid: 5309892760404492424
     entryNodes:
     - rid: 5309892720164339950
     edges:
@@ -61,6 +61,13 @@ MonoBehaviour:
       outputNodeGUID: fd7f0d39-56ea-4b69-9888-6485ce2b0357
       inputFieldName: obj
       outputFieldName: output
+      inputPortIdentifier: 
+      outputPortIdentifier: 
+    - GUID: 786a4087-0802-49b7-aa8e-aa80d8f812dd
+      inputNodeGUID: d64abda3-a800-4ad8-8b5f-8a7730e1332b
+      outputNodeGUID: 868c768b-9fed-473e-8a90-bd8a0b276143
+      inputFieldName: executed
+      outputFieldName: executes
       inputPortIdentifier: 
       outputPortIdentifier: 
     - GUID: 6ceba2c5-d251-4265-a0e9-8d6214de10be
@@ -112,19 +119,12 @@ MonoBehaviour:
       outputFieldName: index
       inputPortIdentifier: 
       outputPortIdentifier: 
-    - GUID: 9d7cbee8-978a-4380-8f5a-46ba7b954dff
-      inputNodeGUID: 2341d220-38d6-46bd-b8a4-18cc34fb5563
+    - GUID: 505304bd-f669-469d-b13e-e20f8b9086aa
+      inputNodeGUID: 346e177e-2836-4d29-a985-cddde850d4a4
       outputNodeGUID: d68b0273-79ff-4c3c-8881-e5fdb3798d90
-      inputFieldName: input
+      inputFieldName: obj
       outputFieldName: index
       inputPortIdentifier: 
-      outputPortIdentifier: 
-    - GUID: 70c7dba1-753c-49a3-88b7-eeba0b33eb4f
-      inputNodeGUID: 2341d220-38d6-46bd-b8a4-18cc34fb5563
-      outputNodeGUID: d68b0273-79ff-4c3c-8881-e5fdb3798d90
-      inputFieldName: selected
-      outputFieldName: index
-      inputPortIdentifier: default
       outputPortIdentifier: 
     - GUID: 739516d6-b200-48e4-90ef-51f2f2896729
       inputNodeGUID: 07d6b3d3-bc8e-4ec1-b1f2-67374d09c04f
@@ -140,20 +140,6 @@ MonoBehaviour:
       outputFieldName: output
       inputPortIdentifier: 
       outputPortIdentifier: default
-    - GUID: 24410177-da3c-4586-8284-b98e3c7079a4
-      inputNodeGUID: 2341d220-38d6-46bd-b8a4-18cc34fb5563
-      outputNodeGUID: 4ed7fc20-056b-4c44-95fb-61feecbb4929
-      inputFieldName: selected
-      outputFieldName: output
-      inputPortIdentifier: 8
-      outputPortIdentifier: 
-    - GUID: 2609f7d9-7ced-44d3-93a4-c41a54d6d28f
-      inputNodeGUID: 346e177e-2836-4d29-a985-cddde850d4a4
-      outputNodeGUID: 2341d220-38d6-46bd-b8a4-18cc34fb5563
-      inputFieldName: obj
-      outputFieldName: result
-      inputPortIdentifier: 
-      outputPortIdentifier: 
     - GUID: ebc2591b-2061-435d-a0cd-4ce5b4d4d844
       inputNodeGUID: 2f6c13c7-7423-42cc-a495-7e5fce878f13
       outputNodeGUID: 93cb6af0-ec2a-42a0-a19a-c11567ebfe17
@@ -161,40 +147,19 @@ MonoBehaviour:
       outputFieldName: output
       inputPortIdentifier: 
       outputPortIdentifier: 
-    - GUID: abb9fe0f-840e-4e61-b9c5-4ed9affdf31d
-      inputNodeGUID: 2341d220-38d6-46bd-b8a4-18cc34fb5563
-      outputNodeGUID: 9d5d6242-3672-49ce-b4d4-ee733c65859b
-      inputFieldName: selected
-      outputFieldName: output
-      inputPortIdentifier: 6
-      outputPortIdentifier: 
     groups: []
     stackNodes: []
     exposedParameters:
     - rid: 5309892737699151875
     stickyNotes: []
     nodeInspectorReference: {fileID: 0}
-    position: {x: 373, y: 372, z: 0}
-    scale: {x: 0.21494322, y: 0.21494322, z: 1}
+    position: {x: 112, y: 929, z: 0}
+    scale: {x: 0.8695652, y: 0.8695652, z: 1}
   references:
     version: 2
     RefIds:
-    - rid: 234564586037575955
-      type: {class: SelectOnIntNode, ns: , asm: Assembly-CSharp}
-      data:
-        GUID: 2341d220-38d6-46bd-b8a4-18cc34fb5563
-        nodeCustomName: 
-        position:
-          serializedVersion: 2
-          x: 842
-          y: -91.608696
-          width: 129
-          height: 147
-        expanded: 1
-        debug: 0
-        nodeLock: 0
-        input: 10
-        options: 0800000006000000
+    - rid: -2
+      type: {class: , ns: , asm: }
     - rid: 234564586037576012
       type: {class: StringNode, ns: , asm: Assembly-CSharp}
       data:
@@ -426,7 +391,7 @@ MonoBehaviour:
         expanded: 0
         debug: 0
         nodeLock: 0
-        seconds: 1
+        seconds: 0.1
         unscaledTime: 0
     - rid: 5309892737699151873
       type: {class: ConsoleNode, ns: BBBirder.Graphs, asm: Assembly-CSharp}
@@ -473,3 +438,73 @@ MonoBehaviour:
         isHidden: 0
         expanded: 0
         guid: 000e8f84-77f3-4cd9-8656-aba6042fe661
+    - rid: 5309892760404492424
+      type: {class: EXTaskNode, ns: BBBirder.Graphs, asm: Assembly-CSharp}
+      data:
+        GUID: d64abda3-a800-4ad8-8b5f-8a7730e1332b
+        nodeCustomName: "\u5EF6\u8FDF\u6253\u5370"
+        position:
+          serializedVersion: 2
+          x: 1325.9263
+          y: -778.2174
+          width: 170
+          height: 77
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        procedure:
+          instructions:
+          - instruction:
+              rid: 5309892760404492427
+          - instruction:
+              rid: 5309892760404492430
+    - rid: 5309892760404492427
+      type: {class: Wait, ns: BBBirder.Instructions, asm: BBBirder.Instructions}
+      data:
+        seconds:
+          useInstruction: 1
+          constantValue: 0
+          instruction:
+            rid: 5309892760404492429
+    - rid: 5309892760404492429
+      type: {class: AddNumber, ns: BBBirder.Instructions, asm: BBBirder.Instructions}
+      data:
+        a:
+          useInstruction: 0
+          constantValue: 0.82
+          instruction:
+            rid: -2
+        b:
+          useInstruction: 0
+          constantValue: 0.63
+          instruction:
+            rid: -2
+    - rid: 5309892760404492430
+      type: {class: Log, ns: BBBirder.Instructions, asm: BBBirder.Instructions}
+      data:
+        message:
+          useInstruction: 1
+          constantValue: 
+          instruction:
+            rid: 5309892760404492431
+    - rid: 5309892760404492431
+      type: {class: GetStringLength, ns: BBBirder.Instructions, asm: BBBirder.Instructions}
+      data:
+        text:
+          useInstruction: 1
+          constantValue: 
+          instruction:
+            rid: 5309892760404492432
+    - rid: 5309892760404492432
+      type: {class: AddNumber, ns: BBBirder.Instructions, asm: BBBirder.Instructions}
+      data:
+        a:
+          useInstruction: 0
+          constantValue: 11
+          instruction:
+            rid: -2
+        b:
+          useInstruction: 0
+          constantValue: 99
+          instruction:
+            rid: -2

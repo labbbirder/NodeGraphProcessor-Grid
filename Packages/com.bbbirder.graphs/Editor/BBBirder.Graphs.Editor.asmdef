@@ -2,7 +2,8 @@
     "name": "BBBirder.Graphs.Editor",
     "rootNamespace": "BBBirder.Graphs.Editor",
     "references": [
-        "BBBirder.Graphs"
+        "BBBirder.Graphs",
+        "BBBirder.Utils.Editor"
     ],
     "includePlatforms": [
         "Editor"

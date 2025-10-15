@@ -172,6 +172,7 @@ MonoBehaviour:
   template: {fileID: 11400000, guid: bed0f465ef83aa040af326345414136f, type: 2}
   graph:
     nodes: []
+    entryNodes: []
     edges: []
     groups: []
     stackNodes: []
@@ -180,7 +181,6 @@ MonoBehaviour:
     nodeInspectorReference: {fileID: 0}
     position: {x: 0, y: 0, z: 0}
     scale: {x: 1, y: 1, z: 1}
-    startNodes: []
   references:
     version: 2
     RefIds: []
@@ -214,9 +214,28 @@ MonoBehaviour:
   eee:
     asd: 232
     aa: 11
+  valueGetter:
+    useInstruction: 1
+    constantValue: 111
+    instruction:
+      rid: 5309892744393261056
+  procedure:
+    instructions:
+    - instruction:
+        rid: 5309892760404492303
+    - instruction:
+        rid: 5309892760404492304
+    - instruction:
+        rid: 5309892760404492305
+    - instruction:
+        rid: 5309892760404492375
+    - instruction:
+        rid: 5309892760404492389
   references:
     version: 2
     RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
     - rid: 5309892650442686464
       type: {class: Test/Bar2, ns: , asm: Assembly-CSharp}
       data:
@@ -231,6 +250,93 @@ MonoBehaviour:
         aa: 0
         dasd: 
         aa22: 0
+    - rid: 5309892744393261056
+      type: {class: AddNumber, ns: BBBirder.Instructions, asm: BBBirder.Instructions}
+      data:
+        a:
+          useInstruction: 1
+          constantValue: 0
+          instruction:
+            rid: 5309892744393261060
+        b:
+          useInstruction: 1
+          constantValue: 0
+          instruction:
+            rid: 5309892744393261059
+    - rid: 5309892744393261059
+      type: {class: GetStringLength, ns: BBBirder.Instructions, asm: BBBirder.Instructions}
+      data:
+        text:
+          useInstruction: 0
+          constantValue: "\u54C8\u54C8\u54C8"
+          instruction:
+            rid: -2
+    - rid: 5309892744393261060
+      type: {class: AddNumber, ns: BBBirder.Instructions, asm: BBBirder.Instructions}
+      data:
+        a:
+          useInstruction: 0
+          constantValue: 213
+          instruction:
+            rid: -2
+        b:
+          useInstruction: 0
+          constantValue: 0.54
+          instruction:
+            rid: -2
+    - rid: 5309892760404492303
+      type: {class: Log, ns: BBBirder.Instructions, asm: BBBirder.Instructions}
+      data:
+        message:
+          useInstruction: 1
+          constantValue: asd
+          instruction:
+            rid: -2
+    - rid: 5309892760404492304
+      type: {class: Log, ns: BBBirder.Instructions, asm: BBBirder.Instructions}
+      data:
+        message:
+          useInstruction: 0
+          constantValue: 
+          instruction:
+            rid: -2
+    - rid: 5309892760404492305
+      type: {class: Wait, ns: BBBirder.Instructions, asm: BBBirder.Instructions}
+      data:
+        seconds:
+          useInstruction: 0
+          constantValue: 0
+          instruction:
+            rid: -2
+    - rid: 5309892760404492375
+      type: {class: InvertNumber, ns: BBBirder.Instructions, asm: BBBirder.Instructions}
+      data:
+        value:
+          useInstruction: 1
+          constantValue: 0
+          instruction:
+            rid: 5309892760404492376
+    - rid: 5309892760404492376
+      type: {class: InvertNumber, ns: BBBirder.Instructions, asm: BBBirder.Instructions}
+      data:
+        value:
+          useInstruction: 0
+          constantValue: 0
+          instruction:
+            rid: -2
+    - rid: 5309892760404492389
+      type: {class: Vector2Distance, ns: BBBirder.Instructions, asm: BBBirder.Instructions}
+      data:
+        a:
+          useInstruction: 0
+          constantValue: {x: 0, y: 0}
+          instruction:
+            rid: -2
+        b:
+          useInstruction: 0
+          constantValue: {x: 0, y: 0}
+          instruction:
+            rid: -2
 --- !u!1 &271893225
 GameObject:
   m_ObjectHideFlags: 0

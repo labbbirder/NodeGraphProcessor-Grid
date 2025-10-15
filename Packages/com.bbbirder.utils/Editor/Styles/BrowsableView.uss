@@ -1,0 +1,57 @@
+.BrowsableItem
+{
+    flex-direction: row;
+    align-items: center;
+    padding-left:16px;
+}
+
+.BrowsableItem:hover
+{
+    background-color: rgba(41, 98, 173, 1);
+}
+
+.BrowsableItem.folder>#imgRight
+{
+    background-image: url("../Textures/icon-park-outline--right.png");
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+#InstructionBrowseView>#Head {
+    padding-bottom:3px;
+    padding-top:3px;
+}
+
+#InstructionBrowseView
+{
+    border-width: 2px;
+    border-color: #222;
+}
+
+#InstructionBrowseView #imgSearch
+{
+    background-image: url("../Textures/iconamoon--search-bold.png");
+}
+
+#nav
+{
+    flex-direction: row;
+    align-items: center;
+}
+
+#Head,#Foot
+{
+    background-color: rgba(0,0,0,0.2);
+}
+
+#nav>#txtNav
+{
+    flex-grow:1;
+    -unity-text-align: middle-center;
+    -unity-font-style: bold;
+}
+
+#nav>#imgLeft
+{
+    background-image: url("../Textures/icon-park-outline--left.png");
+    -unity-background-scale-mode: scale-to-fit;
+}

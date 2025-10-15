@@ -1,0 +1,22 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Packages/com.bbbirder.instructions/Editor/UIElements/Styles/BrowsableView.uss?fileID=7433441132597879392&amp;guid=d0fe827b491b7d1409e66f942243425f&amp;type=3#BrowsableView" />
+    <ui:VisualElement name="Head" style="flex-direction: row;">
+        <ui:VisualElement name="imgSearch" style="width: 21px; -unity-background-scale-mode: scale-to-fit; margin-top: 1px; margin-right: 1px; margin-bottom: 1px; margin-left: 1px;" />
+        <ui:TextField picking-mode="Ignore" name="txtSearch" style="flex-grow: 1; font-size: 16px;" />
+    </ui:VisualElement>
+    <ui:VisualElement name="Body" style="flex-grow: 1;">
+        <ui:VisualElement name="nav" style="background-color: rgba(255, 255, 255, 0.16); padding-top: 3px; padding-right: 3px; padding-bottom: 3px; padding-left: 3px; flex-direction: row;">
+            <ui:VisualElement name="imgLeft" style="width: 16px; height: 16px;" />
+            <ui:Label tabindex="-1" text="Label" parse-escape-sequences="true" display-tooltip-when-elided="true" name="txtNav" />
+        </ui:VisualElement>
+        <ui:ListView name="lstView" virtualization-method="DynamicHeight" show-bound-collection-size="false" style="flex-grow: 1;" />
+        <ui:TreeView name="tree" show-alternating-row-backgrounds="ContentOnly" virtualization-method="FixedHeight" style="display: none;" />
+    </ui:VisualElement>
+    <ui:VisualElement name="Foot" style="padding-top: 6px; padding-right: 6px; padding-bottom: 6px; padding-left: 6px; display: flex;">
+        <ui:VisualElement style="flex-direction: row; align-items: center;">
+            <ui:VisualElement name="imgFoot" style="width: 16px; height: 16px; -unity-background-scale-mode: scale-to-fit;" />
+            <ui:Label tabindex="-1" text="Label" parse-escape-sequences="true" display-tooltip-when-elided="true" name="txtFootTitle" style="-unity-font-style: bold; margin-left: 3px;" />
+        </ui:VisualElement>
+        <ui:Label tabindex="-1" parse-escape-sequences="true" display-tooltip-when-elided="true" name="txtFootContent" style="white-space: normal;" />
+    </ui:VisualElement>
+</ui:UXML>

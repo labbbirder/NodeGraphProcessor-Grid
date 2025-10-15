@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 using UnityEditor;
 using UnityEngine;
 
-namespace GraphProcessor
+namespace BBBirder
 {
     public static class ResUtils
     {

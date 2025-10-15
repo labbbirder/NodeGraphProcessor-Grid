@@ -184,8 +184,8 @@ MonoBehaviour:
     - rid: 5309892628602159172
     stickyNotes: []
     nodeInspectorReference: {fileID: 0}
-    position: {x: 239, y: -225, z: 0}
-    scale: {x: 0.49717674, y: 0.49717674, z: 1}
+    position: {x: 269, y: -16, z: 0}
+    scale: {x: 0.375937, y: 0.375937, z: 1}
   references:
     version: 2
     RefIds:

@@ -1,0 +1,11 @@
+{
+  "name": "com.bbbirder.instructions",
+  "displayName": "Instructions",
+  "version": "0.0.1",
+  "hideInEditor": false,
+  "scripts": {},
+  "dependencies": {
+    "com.cysharp.unitask": "2.5.5"
+  },
+  "author": "bbbirder <502100554@qq.com>"
+}
