@@ -25,4 +25,13 @@ ToolbarOverlayContainer .unity-overlay
 {
     flex-shrink:1;
     /* flex-grow:1; */
-} 
+}
+
+
+.overlay-layout--toolbar-horizontal,
+.overlay-layout--toolbar-horizontal>#unity-overlay,
+.overlay-layout--toolbar-horizontal>#unity-overlay>#overlay-content
+{
+    /* flex-grow:1; */
+    width:100%;
+}

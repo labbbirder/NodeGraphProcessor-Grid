@@ -6,13 +6,16 @@ namespace BBBirder.Graphs
     [Serializable]
     public class BehaviorTree : BaseGraph
     {
-        // public override bool MoveNext()
-        // {
-        //     return base.MoveNext();
-        // }
+        public override bool IsRunning => (EntryNode as BTNode)?.Status == NodeStatus.Running;
+
         public override NodeStatus MoveNext()
         {
-            throw new NotImplementedException();
+            return (EntryNode as BTNode)?.RunInternal() ?? NodeStatus.Normal;
+        }
+
+        public void Abort()
+        {
+            ; (EntryNode as BTNode)?.Abort();
         }
 
         protected override NodeStatus GetNodeStatus(BaseNode node)
@@ -22,6 +25,7 @@ namespace BBBirder.Graphs
 
         public override void Stop()
         {
+            base.Stop();
             foreach (var node in nodes)
             {
                 ; (node as BTNode)?.Reset();
@@ -30,7 +34,9 @@ namespace BBBirder.Graphs
 
         protected override void PostprocessNewNodePort(bool input, NodePort port)
         {
-            port.portData.acceptMultipleEdges = port.owner is not IEntryNode && !input;
+            port.portData.acceptMultipleEdges = port.owner
+                is not IEntryNode and not BTDecoratorNode
+                && !input;
         }
     }
 }

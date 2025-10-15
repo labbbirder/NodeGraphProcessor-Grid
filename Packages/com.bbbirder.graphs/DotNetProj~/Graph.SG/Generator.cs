@@ -53,6 +53,7 @@ namespace Graph.SG
                     var attrName = attrType.Name;
                     var targetSymbol = ctx.TargetSymbol;
                     var targetLocation = ctx.TargetNode.GetLocation();
+                    
                     if (targetSymbol is not IFieldSymbol fieldSymbol)
                     {
                         context.ReportDiagnostic(Diagnostic.Create(new DiagnosticDescriptor(
@@ -63,6 +64,12 @@ namespace Graph.SG
                         continue;
                     }
 
+                    if (fieldSymbol.Type is INamedTypeSymbol namedTypeSymbol &&
+                        namedTypeSymbol.IsFullNameEquals<ExecutionLink>())
+                    {
+                        continue;
+                    }
+                    
                     if (!fieldSymbol.CanBeReferencedByName || fieldSymbol.IsImplicitlyDeclared ||
                         fieldSymbol.IsStatic)
                     {
@@ -113,14 +120,24 @@ namespace Graph.SG
                             module_name = nodeSymbol.ContainingModule.ToDisplayString(),
                             input_fields = ictxs.Select(c =>
                             {
+                                var inputAttribute = c.Attributes.FirstOrDefault(a =>
+                                    a.AttributeClass.IsFullNameEquals<InputAttribute>());
+                                var unpackArgumentPair = inputAttribute.NamedArguments.FirstOrDefault(a =>
+                                                   a.Key.Equals("unpack", StringComparison.InvariantCultureIgnoreCase));
+                                var isUnpack = unpackArgumentPair.Key is not null ? unpackArgumentPair.Value.Value
+                                    : inputAttribute.ConstructorArguments.Length > 1 ? inputAttribute
+                                        .ConstructorArguments.ElementAtOrDefault(1).Value
+                                    : null
+                                    ;
                                 var m = c.TargetSymbol as IFieldSymbol;
-                                var hasAccessorMethod=  nodeSymbol.GetMembers().OfType<IMethodSymbol>().Any(s =>!s.IsStatic
-                                    && s.Name==$"set_{m.Name}"
-                                    && s.ReturnsVoid
-                                    && s.Parameters.Length==1
-                                    && SymbolEqualityComparer.Default.Equals(s.Parameters[0].Type,m.Type));
+                                var hasAccessorMethod=  nodeSymbol.GetMembers().OfType<IMethodSymbol>().Any(setter =>!setter.IsStatic
+                                    && setter.Name==$"set_{m.Name}"
+                                    && setter.ReturnsVoid
+                                    && setter.Parameters.Length==1
+                                    && SymbolEqualityComparer.Default.Equals(setter.Parameters[0].Type,m.Type));
                                 return new
                                 {
+                                    isUnpack,
                                     name = m.Name,
                                     type = m.Type.GetFullName(),
                                     hasAccessorMethod,

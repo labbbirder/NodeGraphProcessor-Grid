@@ -33,6 +33,15 @@ partial class {{node_name}} {
 		; (self as {{node_name}}).@{{f.name}} = value;
 	    {{~ end ~}}
 	}
+	
+	{{~ if f.is_unpack ~}}
+	[Preserve]
+	private static {{f.type}} get_{{f.name}}(BaseNode self)
+	{
+	    return (self as {{node_name}}).@{{f.name}};
+	}
+	{{~ end ~}}
+	
 	{{~ end ~}}
 }
 

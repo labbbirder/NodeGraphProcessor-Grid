@@ -7,9 +7,29 @@ namespace BBBirder.Graphs
     {
         public NodeStatus Status { get; protected internal set; }
 
-        internal protected virtual void Reset()
+        protected virtual NodeStatus Run()
+        {
+            return NodeStatus.Success;
+        }
+
+        internal NodeStatus RunInternal()
+        {
+            if (Status is NodeStatus.Success or NodeStatus.Fault)
+            {
+                Reset();
+            }
+
+            return Status = Run();
+        }
+
+        public virtual void Reset()
         {
             Status = NodeStatus.Normal;
+        }
+
+        public virtual void Abort()
+        {
+            Reset();
         }
     }
 }

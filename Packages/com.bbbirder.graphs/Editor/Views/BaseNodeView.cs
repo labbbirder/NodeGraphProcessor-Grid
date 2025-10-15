@@ -619,9 +619,11 @@ namespace GraphProcessor
 
         public void RemoveMessageView(string message) => RemoveBadge(b => b.badgeText == message);
 
-        public void SetHighlightState(bool state)
+        public void SetHighlightState(NodeStatus status)
         {
-            this.EnableInClassList("Highlight", state);
+            this.EnableInClassList("Highlight-Running", status == NodeStatus.Running);
+            this.EnableInClassList("Highlight-Success", status == NodeStatus.Success);
+            this.EnableInClassList("Highlight-Fault", status == NodeStatus.Fault);
         }
 
         public void SetHeadDotDisplayState(bool state)

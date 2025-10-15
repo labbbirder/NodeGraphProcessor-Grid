@@ -10,191 +10,215 @@ using UnityEngine.UIElements;
 
 namespace GraphProcessor
 {
-	public class BaseGraphWindow : EditorWindow, ISupportsOverlays
-	{
-		const string graphWindowStylePath = "res/Styles/BaseGraphWindowView.uss";
+    public class BaseGraphWindow : EditorWindow, ISupportsOverlays
+    {
+        const string graphWindowStylePath = "res/Styles/BaseGraphWindowView.uss";
 
-		Dictionary<string, OverlayView> overlayViews = new();
-		protected VisualElement rootView;
-		internal protected BaseGraphView graphView;
+        Dictionary<string, OverlayView> overlayViews = new();
+        protected VisualElement rootView;
+        internal protected BaseGraphView graphView;
 
-		[SerializeField]
-		internal protected UnityEngine.Object graphOwner;
+        [SerializeField]
+        internal protected UnityEngine.Object graphOwner;
 
-		bool reloadWorkaround = false;
+        bool reloadWorkaround = false;
 
-		public event Action<BaseGraph> graphLoaded;
-		public event Action<BaseGraph> graphUnloaded;
+        public event Action<BaseGraph> graphLoaded;
+        public event Action<BaseGraph> graphUnloaded;
 
-		public BaseGraph Graph => (graphOwner as IGraphOwner)?.Graph;
+        public BaseGraph Graph => (graphOwner as IGraphOwner)?.Graph;
 
-		public bool IsGraphLoaded
-		{
-			get { return graphView != null && graphView.graph != null; }
-		}
+        public bool IsGraphLoaded
+        {
+            get { return graphView != null && graphView.graph != null; }
+        }
 
-		/// <summary>
-		/// Called by Unity when the window is enabled / opened
-		/// </summary>
-		protected virtual void OnEnable()
-		{
-			InitializeRootView();
+        internal void SaveCurrentGraphAsTemplate(string savePath)
+        {
+            var graphType = Graph.GetType();
+            var templateType = typeof(GraphTemplate<>).MakeGenericType(graphType);
+            Debug.Log(templateType);
+            var asset = ScriptableObject.CreateInstance(TypeCache.GetTypesDerivedFrom(templateType).First());
 
-			if (graphOwner != null)
-				LoadGraph();
-			else
-				reloadWorkaround = true;
-		}
+            if (asset is IGraphTemplate template)
+            {
+                template.SetGraph(ResUtils.CloneObject(Graph) as BaseGraph);
+            }
 
-		internal void RegisterOverlayView(string id, OverlayView overlayView)
-		{
-			overlayViews.Add(id, overlayView);
-		}
+            AssetDatabase.CreateAsset(asset, savePath);
+        }
 
-		protected virtual void Update()
-		{
-			foreach (var (id, overlay) in overlayViews)
-			{
-				overlay.Update();
-			}
+        /// <summary>
+        /// Called by Unity when the window is enabled / opened
+        /// </summary>
+        protected virtual void OnEnable()
+        {
+            InitializeRootView();
 
-			// Workaround for the Refresh option of the editor window:
-			// When Refresh is clicked, OnEnable is called before the serialized data in the
-			// editor window is deserialized, causing the graph view to not be loaded
-			if (reloadWorkaround && graphOwner != null)
-			{
-				LoadGraph();
-				reloadWorkaround = false;
-			}
+            if (graphOwner != null)
+                LoadGraph();
+            else
+                reloadWorkaround = true;
+        }
 
-			if (graphOwner == null && graphView != null)
-			{
-				rootView.Remove(graphView);
-				graphView = null;
-			}
-		}
+        internal void RegisterOverlayView(string id, OverlayView overlayView)
+        {
+            overlayViews.Add(id, overlayView);
+        }
 
-		void LoadGraph()
-		{
-			// We wait for the graph to be initialized
-			if (Graph.IsInitialized)
-				InitializeGraph(graphOwner);
-			else
-				Graph.onEnabled += () => InitializeGraph(graphOwner);
-		}
+        protected virtual void Update()
+        {
+            foreach (var (id, overlay) in overlayViews)
+            {
+                overlay.Update();
+            }
 
-		/// <summary>
-		/// Called by Unity when the window is disabled (happens on domain reload)
-		/// </summary>
-		protected virtual void OnDisable()
-		{
-			if (Graph != null && graphView != null)
-				graphView.SaveGraphToDisk();
-		}
+            // Workaround for the Refresh option of the editor window:
+            // When Refresh is clicked, OnEnable is called before the serialized data in the
+            // editor window is deserialized, causing the graph view to not be loaded
+            if (reloadWorkaround && graphOwner != null)
+            {
+                LoadGraph();
+                reloadWorkaround = false;
+            }
 
-		/// <summary>
-		/// Called by Unity when the window is closed
-		/// </summary>
-		protected virtual void OnDestroy()
-		{
-			graphView?.Dispose();
-		}
+            if (graphOwner == null && graphView != null)
+            {
+                rootView.Remove(graphView);
+                graphView = null;
+            }
+        }
 
-		void InitializeRootView()
-		{
-			rootView = base.rootVisualElement;
+        void LoadGraph()
+        {
+            // We wait for the graph to be initialized
+            if (Graph.IsInitialized)
+                InitializeGraph(graphOwner);
+            else
+                Graph.onEnabled += () => InitializeGraph(graphOwner);
+        }
 
-			rootView.name = "graphRootView";
+        /// <summary>
+        /// Called by Unity when the window is disabled (happens on domain reload)
+        /// </summary>
+        protected virtual void OnDisable()
+        {
+            if (Graph != null && graphView != null)
+                graphView.SaveGraphToDisk();
+        }
 
-			rootView.RegisterCallback<AttachToPanelEvent>(e =>
-			{
-				e.destinationPanel.visualTree.styleSheets.Add(ResUtils.Load<StyleSheet>(graphWindowStylePath));
-			});
+        /// <summary>
+        /// Called by Unity when the window is closed
+        /// </summary>
+        protected virtual void OnDestroy()
+        {
+            graphView?.Dispose();
+        }
 
-			rootView.StretchToParentSize();
-		}
+        void InitializeRootView()
+        {
+            this.minSize = new(460, 320);
+            rootView = base.rootVisualElement;
 
-		public void InitializeGraph(UnityEngine.Object graphOwner)
-		{
-			rootView = base.rootVisualElement;
+            rootView.name = "graphRootView";
 
-			if (this.graphOwner != null && graphOwner != this.graphOwner)
-			{
-				// Save the graph to the disk
-				EditorUtility.SetDirty(this.graphOwner as UnityEngine.Object);
-				AssetDatabase.SaveAssets();
+            if (rootView.panel is { } panel)
+            {
+                panel.visualTree.styleSheets.Add(ResUtils.Load<StyleSheet>(graphWindowStylePath));
+            }
+            else
+            {
+                rootView.RegisterCallback<AttachToPanelEvent>(e =>
+                {
+                    var panel = e.destinationPanel;
+                    panel.visualTree.styleSheets.Add(ResUtils.Load<StyleSheet>(graphWindowStylePath));
+                });
+            }
 
-				// Unload the graph
-				graphUnloaded?.Invoke(this.Graph);
-			}
+            rootView.StretchToParentSize();
+        }
 
-			this.graphOwner = graphOwner;
-			graphLoaded?.Invoke(Graph);
+        public void InitializeGraph(UnityEngine.Object graphOwner)
+        {
+            rootView = base.rootVisualElement;
 
-			if (graphView != null)
-				rootView.Remove(graphView);
+            if (this.graphOwner != null && graphOwner != this.graphOwner)
+            {
+                // Save the graph to the disk
+                EditorUtility.SetDirty(this.graphOwner as UnityEngine.Object);
+                AssetDatabase.SaveAssets();
 
-			//Create graph view
-			var graphViewType = EditorTypeCache.GetGraphViewType(Graph.GetType()) ?? typeof(BaseGraphView);
-			graphView = Activator.CreateInstance(graphViewType, (object)this) as BaseGraphView;
-			rootView.Add(graphView);
+                // Unload the graph
+                graphUnloaded?.Invoke(this.Graph);
+            }
 
-			var title = graphView.Title;
-			var icon = graphView.Icon;
-			titleContent = icon ? new(title, icon) : new(title);
+            this.graphOwner = graphOwner;
+            graphLoaded?.Invoke(Graph);
 
-			graphView.Initialize(Graph, overlayViews);
+            if (graphView != null)
+                rootView.Remove(graphView);
 
-			// InitializeGraphView(graphView);
+            //Create graph view
+            var graphViewType = EditorTypeCache.GetGraphViewType(Graph.GetType()) ?? typeof(BaseGraphView);
+            graphView = Activator.CreateInstance(graphViewType, (object)this) as BaseGraphView;
+            rootView.Add(graphView);
 
-			// TOOD: onSceneLinked...
+            var title = graphView.Title;
+            var icon = graphView.Icon;
+            titleContent = icon ? new(title, icon) : new(title);
 
-			if (Graph.IsLinkedToScene())
-				LinkGraphWindowToScene(Graph.GetLinkedScene());
-			else
-				Graph.onSceneLinked += LinkGraphWindowToScene;
-		}
+            graphView.Initialize(Graph, overlayViews);
 
-		void LinkGraphWindowToScene(Scene scene)
-		{
-			EditorSceneManager.sceneClosed += CloseWindowWhenSceneIsClosed;
+            // InitializeGraphView(graphView);
 
-			void CloseWindowWhenSceneIsClosed(Scene closedScene)
-			{
-				if (scene == closedScene)
-				{
-					Close();
-					EditorSceneManager.sceneClosed -= CloseWindowWhenSceneIsClosed;
-				}
-			}
-		}
+            // TOOD: onSceneLinked...
 
-		internal void SetOverlayDisplayState(string id, bool state)
-		{
-			if (overlayViews.TryGetValue(id, out var view))
-			{
-				view.displayed = state;
-			}
-		}
+            if (Graph.IsLinkedToScene())
+                LinkGraphWindowToScene(Graph.GetLinkedScene());
+            else
+                Graph.onSceneLinked += LinkGraphWindowToScene;
+        }
 
-		internal bool GetOverlayDisplayState(string id)
-		{
-			if (overlayViews.TryGetValue(id, out var view))
-			{
-				return view.displayed;
-			}
+        void LinkGraphWindowToScene(Scene scene)
+        {
+            EditorSceneManager.sceneClosed += CloseWindowWhenSceneIsClosed;
 
-			return false;
-		}
+            void CloseWindowWhenSceneIsClosed(Scene closedScene)
+            {
+                if (scene == closedScene)
+                {
+                    Close();
+                    EditorSceneManager.sceneClosed -= CloseWindowWhenSceneIsClosed;
+                }
+            }
+        }
 
-		public virtual void OnGraphDeleted()
-		{
-			// if (Graph != null && graphView != null)
-			// 	rootView.Remove(graphView);
+        internal void SetOverlayDisplayState(string id, bool state)
+        {
+            if (overlayViews.TryGetValue(id, out var view))
+            {
+                view.displayed = state;
+            }
+        }
 
-			// graphView = null;
-		}
+        internal bool GetOverlayDisplayState(string id)
+        {
+            if (overlayViews.TryGetValue(id, out var view))
+            {
+                return view.displayed;
+            }
 
-		// protected virtual void InitializeGraphView(BaseGraphView view) { }
-	}
+            return false;
+        }
+
+        public virtual void OnGraphDeleted()
+        {
+            // if (Graph != null && graphView != null)
+            // 	rootView.Remove(graphView);
+
+            // graphView = null;
+        }
+
+        // protected virtual void InitializeGraphView(BaseGraphView view) { }
+    }
 }

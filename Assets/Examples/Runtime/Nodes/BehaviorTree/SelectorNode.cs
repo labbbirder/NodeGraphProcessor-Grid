@@ -2,7 +2,7 @@ using GraphProcessor;
 
 namespace BBBirder.Graphs
 {
-    [System.Serializable, NodeMenuItem(DisplayName)]
+    [System.Serializable, NodeMenuItem("Composites/" + DisplayName)]
     public partial class SelectorNode : BTNode
     {
         const string DisplayName = "Selector";
@@ -16,39 +16,59 @@ namespace BBBirder.Graphs
 
         private int runningIndex;
 
-        // public override NodeStatus MoveNext()
-        // {
-        //     var edges = outputPorts[0].GetEdges();
-        //     if (runningIndex >= edges.Count || runningIndex < 0)
-        //     {
-        //         runningIndex = 0;
-        //     }
+        protected override NodeStatus Run()
+        {
+            var edges = outputPorts[0].GetEdges();
 
+            if (edges.Count == 0) return NodeStatus.Success;
 
-        //     for (; runningIndex < edges.Count; runningIndex++)
-        //     {
-        //         var e = edges[runningIndex];
-        //         NodeStatus status = e.inputNode.MoveNext();
+            if (runningIndex >= edges.Count || runningIndex < 0)
+            {
+                runningIndex = 0;
+            }
 
-        //         if (status is NodeStatus.Success)
-        //         {
-        //             return NodeStatus.Success;
-        //         }
-        //         else if (status is NodeStatus.Fault)
-        //         {
-        //             continue;
-        //         }
-        //         else if (status is NodeStatus.Running)
-        //         {
-        //             return NodeStatus.Running;
-        //         }
-        //     }
-        // }
+            for (; runningIndex < edges.Count; runningIndex++)
+            {
+                var e = edges[runningIndex];
+                NodeStatus status = (e.inputNode as BTNode).RunInternal();
 
-        // public override NodeStatus MoveNext()
-        // {
-        //     EnqueueExecutionPort(nameof(executes));
-        //     return NodeStatus.Success;
-        // }
+                if (status is NodeStatus.Success)
+                {
+                    return NodeStatus.Success;
+                }
+                else if (status is NodeStatus.Fault)
+                {
+                    continue;
+                }
+                else if (status is NodeStatus.Running)
+                {
+                    return NodeStatus.Running;
+                }
+            }
+
+            return NodeStatus.Fault;
+        }
+
+        public override void Reset()
+        {
+            runningIndex = 0;
+            base.Reset();
+        }
+
+        public override void Abort()
+        {
+            var edges = outputPorts[0].GetEdges();
+            if (runningIndex < edges.Count && runningIndex >= 0)
+            {
+                var e = edges[runningIndex];
+                var n = e.inputNode as BTNode;
+                if (n.Status is NodeStatus.Running)
+                {
+                    n.Abort();
+                }
+            }
+
+            Reset();
+        }
     }
 }

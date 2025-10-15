@@ -225,7 +225,7 @@ namespace GraphProcessor
 		{
 			foreach (var nodeView in nodeViews)
 			{
-				nodeView.SetHighlightState(nodeView.nodeTarget.GetStatus(graph) == NodeStatus.Running);
+				nodeView.SetHighlightState(nodeView.nodeTarget.GetStatus(graph));
 			}
 		}
 

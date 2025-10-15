@@ -177,6 +177,26 @@ namespace GraphProcessor
             return GetNodeFieldSetter(fieldInfo, typeof(T)) as Action<BaseNode, T>;
         }
 
+        static Dictionary<FieldInfo, Delegate> s_unpackedGetter = new();
+
+        private static Delegate GetUnpackedNodeFieldGetter(FieldInfo fieldInfo)
+        {
+            const BindingFlags Flags = BindingFlags.Static | BindingFlags.NonPublic;
+            if (!s_unpackedGetter.TryGetValue(fieldInfo, out var @delegate))
+            {
+                var methodInfo = fieldInfo.DeclaringType.GetMethod("get_" + fieldInfo.Name, Flags);
+                var funcType = typeof(Func<,>).MakeGenericType(typeof(BaseNode), fieldInfo.FieldType);
+                s_unpackedGetter[fieldInfo] = @delegate = methodInfo.CreateDelegate(funcType);
+            }
+
+            return @delegate;
+        }
+
+        private static Func<BaseNode, T> GetUnpackedNodeFieldGetter<T>(FieldInfo fieldInfo)
+        {
+            return GetUnpackedNodeFieldGetter(fieldInfo) as Func<BaseNode, T>;
+        }
+
         private Action<SerializableEdge> CreateSoloTransfer()
         {
             var edge = edges[0];
@@ -232,8 +252,8 @@ namespace GraphProcessor
             //     .Select(e => (GetNodeFieldGetter<TElement>(e.outputPort.fieldInfo), e.outputNode))
             //     .ToArray();
 
-#warning TODO: expose getter as well.
             var setter = GetNodeFieldSetter<TCollection>(fieldInfo);
+            var getter = GetUnpackedNodeFieldGetter<TCollection>(fieldInfo);
             if (collectionMetatype is CollectionMetatype.List)
             {
                 return (port, edgeIndex) =>
@@ -241,7 +261,7 @@ namespace GraphProcessor
                     var cnt = edges.Count;
                     var node = port.owner;
 
-                    var list = fieldInfo.GetValue(node) as IList<TElement>;
+                    var list = getter(node) as IList<TElement>;
                     if (list is null)
                     {
                         list = Activator.CreateInstance(fieldInfo.FieldType) as IList<TElement>;
@@ -279,7 +299,7 @@ namespace GraphProcessor
                     var cnt = edges.Count;
                     var node = port.owner;
 
-                    var arr = fieldInfo.GetValue(node) as TElement[];
+                    var arr = getter(node) as TElement[];
                     if (arr is null || arr.Length != cnt)
                     {
                         arr = new TElement[cnt];
@@ -308,7 +328,7 @@ namespace GraphProcessor
                     var cnt = edges.Count;
                     var node = port.owner;
 
-                    var container = fieldInfo.GetValue(node) as ICollection<TElement>;
+                    var container = getter(node) as ICollection<TElement>;
 
                     if (container is null)
                     {
@@ -327,15 +347,15 @@ namespace GraphProcessor
             else
             {
                 throw new NotSupportedException($"type {typeof(TCollection)}");
-                var edge = edges[0];
-                var getter = GetNodeFieldGetter<TCollection>(edge.outputPort.fieldInfo);
-                return (port, edgeIndex) =>
-                {
-                    var node = port.owner;
-                    var nfrom = port.edges[0].outputNode;
+                // var edge = edges[0];
+                // var getter = GetNodeFieldGetter<TCollection>(edge.outputPort.fieldInfo);
+                // return (port, edgeIndex) =>
+                // {
+                //     var node = port.owner;
+                //     var nfrom = port.edges[0].outputNode;
 
-                    setter(node, getter(nfrom));
-                };
+                //     setter(node, getter(nfrom));
+                // };
             }
 
             static TElement PullFromEdge(SerializableEdge edge)
@@ -450,6 +470,11 @@ namespace GraphProcessor
         /// </summary>
         internal void PullData()
         {
+            if (this.fieldInfo.FieldType == typeof(ExecutionLink))
+            {
+                return;
+            }
+
             if (edges.Count > 0)
             {
                 if (portData.unpack)

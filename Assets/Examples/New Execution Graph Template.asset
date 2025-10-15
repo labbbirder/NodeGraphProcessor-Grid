@@ -84,6 +84,13 @@ MonoBehaviour:
       outputFieldName: executes
       inputPortIdentifier: 
       outputPortIdentifier: 
+    - GUID: 80381d3f-77d2-442b-a5e4-75611671c510
+      inputNodeGUID: c66193b2-2176-436d-98ff-491b76574b33
+      outputNodeGUID: 170395ba-21c9-4c4c-939c-7ef33127ded0
+      inputFieldName: executed
+      outputFieldName: executes
+      inputPortIdentifier: 
+      outputPortIdentifier: 
     - GUID: 307ebb13-e845-42e9-9c2f-d1cbdf5d61d3
       inputNodeGUID: 170395ba-21c9-4c4c-939c-7ef33127ded0
       outputNodeGUID: d68b0273-79ff-4c3c-8881-e5fdb3798d90
@@ -118,13 +125,6 @@ MonoBehaviour:
       inputFieldName: selected
       outputFieldName: index
       inputPortIdentifier: default
-      outputPortIdentifier: 
-    - GUID: 80381d3f-77d2-442b-a5e4-75611671c510
-      inputNodeGUID: c66193b2-2176-436d-98ff-491b76574b33
-      outputNodeGUID: 170395ba-21c9-4c4c-939c-7ef33127ded0
-      inputFieldName: executed
-      outputFieldName: executes
-      inputPortIdentifier: 
       outputPortIdentifier: 
     - GUID: 739516d6-b200-48e4-90ef-51f2f2896729
       inputNodeGUID: 07d6b3d3-bc8e-4ec1-b1f2-67374d09c04f
@@ -170,11 +170,12 @@ MonoBehaviour:
       outputPortIdentifier: 
     groups: []
     stackNodes: []
-    exposedParameters: []
+    exposedParameters:
+    - rid: 5309892737699151875
     stickyNotes: []
     nodeInspectorReference: {fileID: 0}
-    position: {x: 68, y: 569, z: 0}
-    scale: {x: 0.7561437, y: 0.7561437, z: 1}
+    position: {x: 373, y: 372, z: 0}
+    scale: {x: 0.21494322, y: 0.21494322, z: 1}
   references:
     version: 2
     RefIds:
@@ -192,7 +193,7 @@ MonoBehaviour:
         expanded: 1
         debug: 0
         nodeLock: 0
-        input: 2
+        input: 10
         options: 0800000006000000
     - rid: 234564586037576012
       type: {class: StringNode, ns: , asm: Assembly-CSharp}
@@ -372,7 +373,7 @@ MonoBehaviour:
         expanded: 0
         debug: 0
         nodeLock: 0
-        index: 3
+        index: 11
         start: 0
         end: 10
     - rid: 5309892720164340415
@@ -389,7 +390,7 @@ MonoBehaviour:
         expanded: 0
         debug: 0
         nodeLock: 0
-        input: 2
+        input: 10
         options: 03000000
     - rid: 5309892720164340435
       type: {class: MultiAddNode, ns: BBBirder.Graphs, asm: Assembly-CSharp}
@@ -419,9 +420,9 @@ MonoBehaviour:
         position:
           serializedVersion: 2
           x: 547
-          y: -310.00006
+          y: -327.50003
           width: 170
-          height: 99
+          height: 117
         expanded: 0
         debug: 0
         nodeLock: 0
@@ -457,3 +458,18 @@ MonoBehaviour:
         debug: 0
         nodeLock: 0
         output: asd
+    - rid: 5309892737699151875
+      type: {class: StringParameter, ns: GraphProcessor, asm: BBBirder.Graphs}
+      data:
+        guid: 000e8f84-77f3-4cd9-8656-aba6042fe661
+        name: nickName
+        input: 1
+        settings:
+          rid: 5309892737699151876
+        val: 
+    - rid: 5309892737699151876
+      type: {class: ExposedParameter/Settings, ns: GraphProcessor, asm: BBBirder.Graphs}
+      data:
+        isHidden: 0
+        expanded: 0
+        guid: 000e8f84-77f3-4cd9-8656-aba6042fe661

@@ -1,0 +1,24 @@
+OverlayToolbar .left-group,
+OverlayToolbar .mid-group,
+{
+    flex-direction:row;
+}
+
+OverlayToolbar .right-group
+{
+    flex-direction:row-reverse;
+}
+
+OverlayToolbar .left-group,
+OverlayToolbar .right-group,
+{
+    flex-grow:1;
+    width:0;
+}
+
+OverlayToolbar
+{
+    justify-content:space-between;
+    flex-grow:1;
+    width:100%;
+}

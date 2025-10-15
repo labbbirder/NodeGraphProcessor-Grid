@@ -29,8 +29,18 @@
     border-radius: 0px;
 }
 
-.Highlight {
+.Highlight-Running {
     background-color: rgba(0, 128, 128, 0.8);
+    border-radius: 6px;
+}
+
+.Highlight-Success {
+    background-color: rgba(0, 192, 0, 0.8);
+    border-radius: 6px;
+}
+
+.Highlight-Fault {
+    background-color: rgba(192, 0, 0, 0.8);
     border-radius: 6px;
 }
 
@@ -226,16 +236,17 @@ ParameterNodeView #controls EnumField > VisualElement > VisualElement {
 {
    align-self: center;
    flex-direction: row;
+   position: absolute;
 }
 
 #TopPortContainer
 {
-    margin-bottom: -1px;
+    top: -4px;
 }
 
 #BottomPortContainer
 {
-    margin-top: -1px;
+    bottom: -4px;
 }
 
 #title-button-container
