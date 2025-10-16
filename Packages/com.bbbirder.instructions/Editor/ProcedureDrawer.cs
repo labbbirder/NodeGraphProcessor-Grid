@@ -157,7 +157,7 @@ namespace BBBirder.Instructions
             {
                 if (property.boxedValue is Procedure procedure)
                 {
-                    procedure.Run().Forget();
+                    procedure.RunAsync().Forget();
                 }
             };
 

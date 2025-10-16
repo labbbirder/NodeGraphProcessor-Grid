@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using com.bbbirder;
-using Sirenix.Utilities;
 
 namespace BBBirder.Instructions
 {
@@ -115,7 +114,7 @@ namespace BBBirder.Instructions
             return typeof(void);
         }
 
-        static bool IsInstructCompatibleForReturnType(Type instrType, Type desiredReturnType)
+        public static bool IsInstructCompatibleForReturnType(Type instrType, Type desiredReturnType)
         {
             var instrReturnType = GetInstructionReturnType(instrType);
 

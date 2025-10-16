@@ -59,8 +59,27 @@ namespace BBBirder.Instructions
             root.Add(headContainer);
 
             // popup
+            var fieldType = fieldInfo.FieldType;
+            if (property.propertyPath.EndsWith(']'))
+            {
+                if (fieldType.IsArray)
+                {
+                    fieldType = fieldType.GetElementType();
+                }
+                else
+                {
+                    foreach (var interfType in fieldType.GetInterfaces())
+                    {
+                        if (interfType.IsGenericType && interfType.GetGenericTypeDefinition() == typeof(IList<>))
+                        {
+                            fieldType = interfType.GenericTypeArguments[0];
+                            break;
+                        }
+                    }
+                }
+            }
 
-            var subtypes = InstructionsRegistry.GetValidInstructions(fieldInfo.FieldType);
+            var subtypes = InstructionsRegistry.GetValidInstructions(fieldType);
             var typeIndex = subtypes.IndexOf(propInstr?.managedReferenceValue?.GetType());
             var popup = new PopupField<Type>(null, subtypes, typeIndex, t => t?.Name, t => t?.Name)
             {

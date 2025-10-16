@@ -35,6 +35,7 @@ MonoBehaviour:
     - rid: 5309892737699152082
     - rid: 5309892737699152083
     - rid: 5309892737699152128
+    - rid: 5309892760404492449
     entryNodes:
     - rid: 5309892629070610674
     edges:
@@ -178,17 +179,26 @@ MonoBehaviour:
       outputFieldName: executes
       inputPortIdentifier: 
       outputPortIdentifier: 
+    - GUID: 8c1dc700-6334-4a5a-84c3-5e32e90afabd
+      inputNodeGUID: b2b21810-184f-4f36-b176-83e821151625
+      outputNodeGUID: e883017a-3114-441f-8cc3-ba7a5611b72c
+      inputFieldName: executed
+      outputFieldName: executes
+      inputPortIdentifier: 
+      outputPortIdentifier: 
     groups: []
     stackNodes: []
     exposedParameters:
     - rid: 5309892628602159172
     stickyNotes: []
     nodeInspectorReference: {fileID: 0}
-    position: {x: 269, y: -16, z: 0}
-    scale: {x: 0.375937, y: 0.375937, z: 1}
+    position: {x: 208, y: -454, z: 0}
+    scale: {x: 0.8695652, y: 0.8695652, z: 1}
   references:
     version: 2
     RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
     - rid: 5309892628602159172
       type: {class: Texture2DParameter, ns: GraphProcessor, asm: BBBirder.Graphs}
       data:
@@ -520,3 +530,48 @@ MonoBehaviour:
         expanded: 0
         debug: 0
         nodeLock: 0
+    - rid: 5309892760404492449
+      type: {class: BTTaskNode, ns: BBBirder.Graphs, asm: Assembly-CSharp}
+      data:
+        GUID: b2b21810-184f-4f36-b176-83e821151625
+        nodeCustomName: 
+        position:
+          serializedVersion: 2
+          x: 918.9
+          y: 1177
+          width: 70
+          height: 44
+        expanded: 0
+        debug: 0
+        nodeLock: 0
+        condition:
+          useInstruction: 0
+          constantValue: 1
+          instruction:
+            rid: 5309892760404492481
+        runInstructions:
+          instructions:
+          - instruction:
+              rid: 5309892760404492487
+          - instruction:
+              rid: 5309892760404492480
+    - rid: 5309892760404492480
+      type: {class: Log, ns: BBBirder.Instructions, asm: BBBirder.Instructions}
+      data:
+        message:
+          useInstruction: 0
+          constantValue: ad
+          instruction:
+            rid: -2
+    - rid: 5309892760404492481
+      type: {class: AndInstruction, ns: BBBirder.Instructions, asm: BBBirder.Instructions}
+      data:
+        conditions: []
+    - rid: 5309892760404492487
+      type: {class: Wait, ns: BBBirder.Instructions, asm: BBBirder.Instructions}
+      data:
+        seconds:
+          useInstruction: 0
+          constantValue: 5
+          instruction:
+            rid: -2

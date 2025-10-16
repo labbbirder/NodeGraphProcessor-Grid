@@ -13,14 +13,12 @@ using Sirenix.OdinInspector.Editor;
 
 public static class PropertyDrawerUtility
 {
-    private static bool IsOdinInstalled()
-    {
+    public const bool IsOdinInstalled =
 #if ODIN_INSPECTOR
-        return true;
+        true;
 #else
-        return false;
+        false;
 #endif
-    }
 
     public static bool IsTypeDrawingByOdin(System.Type unityObjectType)
     {
@@ -28,7 +26,7 @@ public static class PropertyDrawerUtility
         if (!InspectorConfig.Instance.EnableOdinInInspector) return false;
 
         var editorType = InspectorConfig.Instance.DrawingConfig.GetEditorType(unityObjectType);
-        Debug.Log($"editor type for {unityObjectType} is {editorType}");
+        // Debug.Log($"editor type for {unityObjectType} is {editorType}");
 
         return editorType == typeof(OdinEditor);
 #else

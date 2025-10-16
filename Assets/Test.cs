@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Reflection;
 using BBBirder;
 using BBBirder.Instructions;
+using Cysharp.Threading.Tasks;
+using Sirenix.OdinInspector;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Profiling;
@@ -32,12 +34,12 @@ public class Test : MonoBehaviour
         public int aa22;
     }
 
-    [ReadOnly]
+    // [ReadOnly]
     [OnChange("ArrayCha")]
     [SerializeField]
     private int[] options;
 
-    [ReadOnly]
+    // [ReadOnly]
     [OnChange("OnIntChanged")]
     public int asdasd;
 
@@ -49,15 +51,15 @@ public class Test : MonoBehaviour
     public Foo foo;
 
     [OnChange("Good")]
-    [ReadOnly]
+    // [ReadOnly]
     public Bar bar;
 
     [OnChange("Good")]
-    [ReadOnly]
+    // [ReadOnly]
     [SerializeReference, Polymorphic]
     public Bar bar2;
     [OnChange("Good")]
-    [ReadOnly]
+    // [ReadOnly]
     [SerializeReference, Polymorphic]
     public Bar bar22;
     [OnChange("Good")]
@@ -82,5 +84,42 @@ public class Test : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+
     }
+
+    public bool useBuild;
+    public int cnt = 100;
+    public int result;
+    float time;
+    void Update()
+    {
+        time = Time.time;
+        if (useBuild)
+        {
+            for (int i = 0; i < cnt; i++)
+                Buildtin().Forget();
+        }
+        else
+        {
+            for (int i = 0; i < cnt; i++)
+                Custom().Forget();
+        }
+    }
+
+    async UniTask Buildtin()
+    {
+        await UniTask.Delay(1);
+        result++;
+    }
+
+    async UniTask Custom()
+    {
+        var t = time + 1;
+        while (time < t)
+        {
+            await UniTask.Yield();
+        }
+        result++;
+    }
+
 }

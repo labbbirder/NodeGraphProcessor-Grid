@@ -130,6 +130,15 @@ namespace BBBirder.Instructions
 
             return task.GetAwaiter().GetResult();
         }
+
+        public static implicit operator Evaluation<T>(T value)
+        {
+            return new Evaluation<T>()
+            {
+                useInstruction = false,
+                constantValue = value,
+            };
+        }
     }
 
     [Serializable]
@@ -137,7 +146,7 @@ namespace BBBirder.Instructions
     {
         public List<Evaluation> instructions;
 
-        public async UniTask Run(CancellationToken cancellation = default)
+        public async UniTask RunAsync(CancellationToken cancellation = default)
         {
             if (instructions == null) return;
 
@@ -147,6 +156,40 @@ namespace BBBirder.Instructions
             }
         }
 
+    }
+
+    [Category("Bool")]
+    public class AndInstruction : Instruction<bool>
+    {
+        public Evaluation<bool>[] conditions;
+        public override UniTask<bool> Execute(CancellationToken cancellation)
+        {
+            var result = true;
+            foreach (var c in conditions)
+            {
+                result &= c.Run();
+                if (!result) break;
+            }
+
+            return UniTask.FromResult(result);
+        }
+    }
+
+    [Category("Bool")]
+    public class OrInstruction : Instruction<bool>
+    {
+        public Evaluation<bool>[] conditions;
+        public override UniTask<bool> Execute(CancellationToken cancellation)
+        {
+            var result = false;
+            foreach (var c in conditions)
+            {
+                result |= c.Run();
+                if (result) break;
+            }
+
+            return UniTask.FromResult(result);
+        }
     }
 
     [Category("Common")]
